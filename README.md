@@ -1,5 +1,5 @@
 # StepExecutionWinForm
-### RedoUndoを利用しステップ実行を実装しました
+### RedoUndoを利用したステップ実行の実装デモ
 
 1. RedoUndoのデモ
 2. BinarySearch

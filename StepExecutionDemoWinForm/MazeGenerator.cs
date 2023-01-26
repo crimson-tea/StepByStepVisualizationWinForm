@@ -7,7 +7,7 @@ namespace StepExecutionWinForm
         public enum Direction { Up, Left, Down, Right }
         public enum Cell { Wall, Road, Start, Goal }
 
-        static Random s_rand = new Random(100001);
+        private static Random s_rand = new Random(100001);
 
         public static readonly Direction[] Directions = new Direction[] {
             Direction.Up,
@@ -90,7 +90,7 @@ namespace StepExecutionWinForm
                     if (field[y2][x2] == Cell.Wall)
                     {
                         field[y][x] = field[y1][x1] = Cell.Road;
-                        // Show(field);
+                        // DebugShow(field);
                         Dfs(x2, y2);
                     }
                 }
@@ -112,7 +112,7 @@ namespace StepExecutionWinForm
             _ => throw new ArgumentException()
         };
 
-        static void Show(Cell[][] field)
+        private static void DebugShow(Cell[][] field)
         {
             foreach (var row in field)
             {

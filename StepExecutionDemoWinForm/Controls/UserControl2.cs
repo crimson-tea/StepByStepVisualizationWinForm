@@ -8,7 +8,7 @@ public partial class UserControl2 : UserControl
     public UserControl2()
     {
         InitializeComponent();
-        RedoUndo = new RedoUndo<BSOperation>(ExecuteRedo, ExecuteUndo);
+        _redoUndo = new RedoUndo<BSOperation>(ExecuteRedo, ExecuteUndo);
     }
 
     public Image CreateBarImage(Size size, Brush brush)
@@ -20,8 +20,7 @@ public partial class UserControl2 : UserControl
         return bitmap;
     }
 
-    List<PictureBox> Bars { get; } = new List<PictureBox>();
-    List<int> Values { get; } = new List<int>();
+    private readonly List<(PictureBox bar, int value)> Bars = new();
 
     private void UserControl2_Load(object sender, EventArgs e)
     {
@@ -34,52 +33,54 @@ public partial class UserControl2 : UserControl
         {
             var picture = new PictureBox();
             picture.Size = new Size(scale, value * scale);
-            Values.Add(value);
             picture.Location = new Point(i * scale, 0);
-            picture.Image = CreateBarImage(picture.Size, DefaultBrush);
-            Bars.Add(picture);
+            picture.Image = CreateBarImage(picture.Size, _defaultBrush);
+            Bars.Add((picture, value));
             value += rand.Next(2);
         }
 
-        var maxHeight = Bars.Last().Height + 10;
-        Bars.ForEach(picture =>
+        var pictures = Bars.Select(x => x.bar).ToArray();
+        var maxHeight = pictures.Last().Height + 10;
+
+        foreach (var picture in pictures)
         {
             picture.Location = new Point(picture.Location.X, maxHeight - picture.Height);
             Debug.WriteLine($"height: {picture.Height} loc: {picture.Location}");
-        });
+        }
 
         SuspendLayout();
-        Controls.AddRange(Bars.ToArray());
+        Controls.AddRange(pictures);
         ResumeLayout();
     }
 
-    readonly BSModel _model = new BSModel();
-    RedoUndo<BSOperation> RedoUndo { get; }
+    private readonly BSModel _model = new BSModel();
+    private readonly RedoUndo<BSOperation> _redoUndo;
 
-    IEnumerator<BSOperation> Enumerator { get; set; }
-    public Brush DefaultBrush { get; } = Brushes.White;
-    public Brush OutOfRangeBrush { get; } = Brushes.Gray;
+    private IEnumerator<BSOperation> _enumerator;
+    private IEnumerator<BSOperation> Enumerator => _enumerator ??= _model.BinarySearch(Bars.Select(x => x.value).ToArray(), TARGET);
+
+    private readonly Brush _defaultBrush = Brushes.White;
+    private readonly Brush _outOfRangeBrush = Brushes.Gray;
+
+    private const int TARGET = 26;
 
     private void NextButton_Click(object sender, EventArgs e)
     {
-        const int TARGET = 26;
-        if (RedoUndo.Redo())
+        if (_redoUndo.Redo())
         {
             return;
         }
 
-        Enumerator ??= _model.BinarySearch(Values.ToArray(), TARGET);
-
         if (Enumerator.MoveNext())
         {
             var op = Enumerator.Current;
-            RedoUndo.Execute(op);
+            _redoUndo.Execute(op);
         }
     }
 
     private void PrevButton_Click(object sender, EventArgs e)
     {
-        if (RedoUndo.Undo())
+        if (_redoUndo.Undo())
         {
             return;
         }
@@ -114,7 +115,7 @@ public partial class UserControl2 : UserControl
 
         void SetColor(Brush brush)
         {
-            var fillBrush = isUndo ? DefaultBrush : OutOfRangeBrush;
+            var fillBrush = isUndo ? _defaultBrush : _outOfRangeBrush;
 
             int start = Math.Max(0, Math.Min(fIndex, tIndex));
             int end = Math.Min(Bars.Count - 1, Math.Max(fIndex, tIndex));
@@ -122,7 +123,7 @@ public partial class UserControl2 : UserControl
             SuspendLayout();
             for (int i = start; i <= end; i++)
             {
-                var bar = Bars[i];
+                var bar = Bars[i].bar;
                 bar.Image = CreateBarImage(bar.Size, fillBrush);
             }
             ResumeLayout();
@@ -131,7 +132,7 @@ public partial class UserControl2 : UserControl
             {
                 if (0 <= fIndex && fIndex < Bars.Count)
                 {
-                    var from = Bars[fIndex];
+                    var from = Bars[fIndex].bar;
                     from.Image = CreateBarImage(from.Size, brush);
                 }
             }
@@ -139,7 +140,7 @@ public partial class UserControl2 : UserControl
             {
                 if (0 <= tIndex && tIndex < Bars.Count)
                 {
-                    var to = Bars[tIndex];
+                    var to = Bars[tIndex].bar;
                     to.Image = CreateBarImage(to.Size, brush);
                 }
             }

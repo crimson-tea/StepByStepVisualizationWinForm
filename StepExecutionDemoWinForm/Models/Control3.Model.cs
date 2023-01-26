@@ -1,4 +1,6 @@
-﻿namespace AnimationWinForm.Control3;
+﻿using System.Diagnostics;
+
+namespace AnimationWinForm.Control3;
 
 internal class Model
 {
@@ -56,7 +58,9 @@ internal class Model
                 {
                     break;
                 }
-                // Debug.Assert(prime * i < 100);
+
+                Debug.Assert(prime * i < 100);
+
                 minFactor[prime * i] = prime;
                 yield return new Operation(OperationType.MarkNonPrime, prime * i, prev);
                 prev = prime * i;
@@ -69,8 +73,10 @@ internal class Model
 
 internal enum OperationType
 {
-    None, Complete,
-    MarkNonPrime, MarkPrime
+    None, 
+    Complete,
+    MarkNonPrime,
+    MarkPrime
 }
 
 internal class Operation

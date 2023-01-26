@@ -15,7 +15,7 @@ public partial class Form1 : Form
         Text = "RedoUndoDemo";
     }
 
-    enum ControlMode { RedoUndo, BinarySearch, Sieve, Graph }
+    private enum ControlMode { RedoUndo, BinarySearch, Sieve, Graph }
 
     static int ModeCount => Enum.GetValues<ControlMode>().Length;
 
@@ -27,7 +27,9 @@ public partial class Form1 : Form
         _controlMode = (ControlMode)(((int)_controlMode + 1) % ModeCount);
 
         Controls.Remove(_currentControl);
+        // Dispose‚ð–Y‚ê‚¸‚É
         _currentControl.Dispose();
+
         (_currentControl, string text, Text) = _controlMode switch
         {
             ControlMode.RedoUndo => (new UserControl1() as UserControl, "Switch2", "RedoUndoDemo"),
@@ -38,6 +40,7 @@ public partial class Form1 : Form
         };
         _currentControl.Location = new Point(9, 9);
         Controls.Add(_currentControl);
+
         SwitchButton.Text = text;
     }
 

@@ -9,12 +9,12 @@ public partial class UserControl4 : UserControl
     public UserControl4()
     {
         InitializeComponent();
-        RedoUndo = new RedoUndo<Operation>(ExecuteRedo, ExecuteUndo, SetProgress);
+        _redoUndo = new RedoUndo<Operation>(ExecuteRedo, ExecuteUndo, SetProgress);
     }
 
     List<List<Label>> Cells { get; } = new();
 
-    private MazeGenerator.Cell[][] _maze;
+    private MazeGenerator.Cell[][]? _maze;
     private int _startX;
     private int _startY;
 
@@ -44,9 +44,6 @@ public partial class UserControl4 : UserControl
                 var label = new Label();
                 label.TextAlign = ContentAlignment.MiddleCenter;
 
-                //label.Font = new Font(label.Font.FontFamily.Name, 7);
-                //label.Text = i.ToString();
-
                 label.Size = labelSize;
                 label.Location = new Point(k * labelSize.Width, i * labelSize.Height);
                 Cells[i].Add(label);
@@ -68,19 +65,19 @@ public partial class UserControl4 : UserControl
         ResumeLayout();
     }
 
-    readonly Model _model = new Model();
+    private readonly Model _model = new Model();
 
     private int[][] _costs;
 
-    RedoUndo<Operation> RedoUndo { get; }
+    private readonly RedoUndo<Operation> _redoUndo;
 
-    IEnumerator<Operation> _enumerator;
-    IEnumerator<Operation> Enumerator => _enumerator ??= _model.Dfs(_maze, _startX, _startY);
+    private IEnumerator<Operation> _enumerator;
+    private IEnumerator<Operation> Enumerator => _enumerator ??= _model.DfsBetter(_maze, _startX, _startY);
 
     private bool _processing = false;
     private void AutoButton_Click(object sender, EventArgs e)
     {
-        var b = (Button)sender;
+        var button = (Button)sender;
 
         if (_processing)
         {
@@ -89,9 +86,9 @@ public partial class UserControl4 : UserControl
         }
 
         _processing = true;
-        b.Text = "Stop";
+        button.Text = "Stop";
 
-        while (_processing && RedoUndo.Redo())
+        while (_processing && _redoUndo.Redo())
         {
             Application.DoEvents();
         }
@@ -100,7 +97,7 @@ public partial class UserControl4 : UserControl
         while (_processing && Enumerator.MoveNext())
         {
             var op = Enumerator.Current;
-            RedoUndo.Execute(op);
+            _redoUndo.Execute(op);
 
             count++;
             if (count % 10 == 0)
@@ -110,12 +107,12 @@ public partial class UserControl4 : UserControl
         }
 
         _processing = false;
-        b.Text = "Auto";
+        button.Text = "Auto";
     }
 
     private void NextButton_Click(object sender, EventArgs e)
     {
-        if (RedoUndo.Redo())
+        if (_redoUndo.Redo())
         {
             return;
         }
@@ -123,13 +120,13 @@ public partial class UserControl4 : UserControl
         if (Enumerator.MoveNext())
         {
             var op = Enumerator.Current;
-            RedoUndo.Execute(op);
+            _redoUndo.Execute(op);
         }
     }
 
     private void PrevButton_Click(object sender, EventArgs e)
     {
-        if (RedoUndo.Undo())
+        if (_redoUndo.Undo())
         {
             return;
         }
@@ -224,17 +221,9 @@ public partial class UserControl4 : UserControl
 
                 if (prev != Point.Empty)
                 {
-                    //Cells[preY][preX].BackColor = Color.DarkGray;
                     Cells[preY][preX].BorderStyle = BorderStyle.FixedSingle;
                 }
-
                 break;
-            //case OperationType.ReWrite:
-            //    Numbers[target].BackColor = Color.LightGreen;
-            //    Numbers[target].BorderStyle = BorderStyle.FixedSingle;
-
-            //    Numbers[prev].BorderStyle = BorderStyle.None;
-            //    break;
             default:
                 break;
         }
@@ -252,15 +241,15 @@ public partial class UserControl4 : UserControl
 
         (_enumerator, SearchTypeLabel.Text) = _seive switch
         {
-            SeiveType.DfsBetter => (_model.Dfs(_maze, _startX, _startY), "DFS (better)"),
-            SeiveType.DfsWorth => (_model.Dfs(_maze, _startX, _startY, true), "DFS (worth)"),
+            SeiveType.DfsBetter => (_model.DfsBetter(_maze, _startX, _startY), "DFS (better)"),
+            SeiveType.DfsWorth => (_model.DfsBetter(_maze, _startX, _startY, true), "DFS (worth)"),
             SeiveType.Bfs => (_model.Bfs(_maze, _startX, _startY), "BFS"),
             SeiveType.Dijkstra => (_model.Dijkstra(_maze, _startX, _startY), "Dijkstra"),
             SeiveType.AStar => (_model.AStar(_maze, _startX, _startY), "A*"),
             _ => throw new ArgumentException()
         };
 
-        RedoUndo.Reset();
+        _redoUndo.Reset();
         RefreshNumbers();
     }
 

@@ -8,12 +8,14 @@ public partial class UserControl3 : UserControl
     public UserControl3()
     {
         InitializeComponent();
-        RedoUndo = new RedoUndo<Operation>(ExecuteRedo, ExecuteUndo, SetProgress);
+        _redoUndo = new RedoUndo<Operation>(ExecuteRedo, ExecuteUndo, SetProgress);
     }
 
-    List<Label> Numbers { get; } = new();
-    List<int> SeiveCount { get; } = new();
-
+    private readonly List<Label> _numbers = new();
+    /// <summary>
+    /// 篩われた回数をカウント
+    /// </summary>
+    private readonly List<int> _sieveCount = new();
     private readonly int _length = 100;
 
     private void UserControl2_Load(object sender, EventArgs e)
@@ -29,24 +31,25 @@ public partial class UserControl3 : UserControl
             label.Text = i.ToString();
             label.Size = new Size(width, height);
             label.Location = new Point((i % col) * width, i / col * height);
-            Numbers.Add(label);
-            SeiveCount.Add(0);
+            _numbers.Add(label);
+            _sieveCount.Add(0);
 
             Debug.WriteLine(label.Location);
         }
 
         SuspendLayout();
-        Controls.AddRange(Numbers.ToArray());
+        Controls.AddRange(_numbers.ToArray());
         ResumeLayout();
     }
 
     readonly Model _model = new Model();
-    RedoUndo<Operation> RedoUndo { get; }
+    private readonly RedoUndo<Operation> _redoUndo;
 
-    IEnumerator<Operation> _enumerator;
-    IEnumerator<Operation> Enumerator => _enumerator ??= _model.SeiveOfEratosthenes(_length);
+    private IEnumerator<Operation> _enumerator;
+    private IEnumerator<Operation> Enumerator => _enumerator ??= _model.SeiveOfEratosthenes(_length);
 
     private bool _processing = false;
+
     private async void AutoButton_Click(object sender, EventArgs e)
     {
         var b = (Button)sender;
@@ -60,7 +63,7 @@ public partial class UserControl3 : UserControl
         _processing = true;
         b.Text = "Stop";
 
-        while (_processing && RedoUndo.Redo())
+        while (_processing && _redoUndo.Redo())
         {
             await Task.Delay(100);
         }
@@ -68,7 +71,7 @@ public partial class UserControl3 : UserControl
         while (_processing && Enumerator.MoveNext())
         {
             var op = Enumerator.Current;
-            RedoUndo.Execute(op);
+            _redoUndo.Execute(op);
             await Task.Delay(100);
         }
 
@@ -78,7 +81,7 @@ public partial class UserControl3 : UserControl
 
     private void NextButton_Click(object sender, EventArgs e)
     {
-        if (RedoUndo.Redo())
+        if (_redoUndo.Redo())
         {
             return;
         }
@@ -86,13 +89,13 @@ public partial class UserControl3 : UserControl
         if (Enumerator.MoveNext())
         {
             var op = Enumerator.Current;
-            RedoUndo.Execute(op);
+            _redoUndo.Execute(op);
         }
     }
 
     private void PrevButton_Click(object sender, EventArgs e)
     {
-        if (RedoUndo.Undo())
+        if (_redoUndo.Undo())
         {
             return;
         }
@@ -109,25 +112,25 @@ public partial class UserControl3 : UserControl
             case OperationType.None:
                 break;
             case OperationType.Complete:
-                Numbers[prev].BorderStyle = BorderStyle.None;
+                _numbers[prev].BorderStyle = BorderStyle.None;
                 break;
             case OperationType.MarkNonPrime:
-                Numbers[target].BackColor = Color.DarkGray;
-                Numbers[target].BorderStyle = BorderStyle.FixedSingle;
+                _numbers[target].BackColor = Color.DarkGray;
+                _numbers[target].BorderStyle = BorderStyle.FixedSingle;
 
                 if (prev >= 0)
                 {
-                    Numbers[prev].BorderStyle = BorderStyle.None;
+                    _numbers[prev].BorderStyle = BorderStyle.None;
                 }
 
-                SeiveCount[target]++;
+                _sieveCount[target]++;
 
                 break;
             case OperationType.MarkPrime:
-                Numbers[target].BackColor = Color.LightGreen;
-                Numbers[target].BorderStyle = BorderStyle.FixedSingle;
+                _numbers[target].BackColor = Color.LightGreen;
+                _numbers[target].BorderStyle = BorderStyle.FixedSingle;
 
-                Numbers[prev].BorderStyle = BorderStyle.None;
+                _numbers[prev].BorderStyle = BorderStyle.None;
                 break;
             default:
                 break;
@@ -145,28 +148,28 @@ public partial class UserControl3 : UserControl
             case OperationType.None:
                 break;
             case OperationType.Complete:
-                Numbers[prev].BorderStyle = BorderStyle.FixedSingle;
+                _numbers[prev].BorderStyle = BorderStyle.FixedSingle;
 
                 break;
             case OperationType.MarkNonPrime:
-                SeiveCount[target]--;
+                _sieveCount[target]--;
 
-                if (SeiveCount[target] == 0)
+                if (_sieveCount[target] == 0)
                 {
-                    Numbers[target].BackColor = SystemColors.Control;
+                    _numbers[target].BackColor = SystemColors.Control;
                 }
 
-                Numbers[target].BorderStyle = BorderStyle.None;
+                _numbers[target].BorderStyle = BorderStyle.None;
                 if (prev >= 0)
                 {
-                    Numbers[prev].BorderStyle = BorderStyle.FixedSingle;
+                    _numbers[prev].BorderStyle = BorderStyle.FixedSingle;
                 }
 
                 break;
             case OperationType.MarkPrime:
-                Numbers[target].BackColor = SystemColors.Control;
-                Numbers[prev].BorderStyle = BorderStyle.FixedSingle;
-                Numbers[target].BorderStyle = BorderStyle.None;
+                _numbers[target].BackColor = SystemColors.Control;
+                _numbers[prev].BorderStyle = BorderStyle.FixedSingle;
+                _numbers[target].BorderStyle = BorderStyle.None;
                 break;
             default:
                 break;
@@ -190,21 +193,21 @@ public partial class UserControl3 : UserControl
             _ => throw new ArgumentException()
         };
 
-        RedoUndo.Reset();
+        _redoUndo.Reset();
         RefreshNumbers();
     }
 
     private void RefreshNumbers()
     {
-        foreach (var number in Numbers)
+        foreach (var number in _numbers)
         {
             number.BackColor = SystemColors.Control;
             number.BorderStyle = BorderStyle.None;
         }
 
-        for (int i = 0; i < SeiveCount.Count; i++)
+        for (int i = 0; i < _sieveCount.Count; i++)
         {
-            SeiveCount[i] = 0;
+            _sieveCount[i] = 0;
         }
     }
 }

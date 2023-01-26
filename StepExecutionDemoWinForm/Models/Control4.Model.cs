@@ -4,7 +4,7 @@ namespace AnimationWinForm.Control4;
 
 internal class Model
 {
-    public IEnumerator<Operation> Dfs(MazeGenerator.Cell[][] cells, int startX, int startY, bool reverse = false)
+    public IEnumerator<Operation> DfsBetter(MazeGenerator.Cell[][] cells, int startX, int startY, bool reverse = false)
     {
         int height = cells.Length;
         int width = cells[0].Length;
@@ -43,22 +43,22 @@ internal class Model
             {
                 var (vx, vy) = MazeGenerator.GetVector(dir);
 
-                int xx = x + vx;
-                int yy = y + vy;
+                int nextX = x + vx;
+                int nextY = y + vy;
 
-                if (cells[yy][xx] == MazeGenerator.Cell.Wall)
+                if (cells[nextY][nextX] == MazeGenerator.Cell.Wall)
                 {
                     continue;
                 }
 
-                stack.Push((xx, yy, length + 1));
+                stack.Push((nextX, nextY, length + 1));
             }
         }
 
         yield return new Operation(OperationType.Complete, previous: prev);
     }
 
-    public IEnumerator<Operation> Dfs2(MazeGenerator.Cell[][] cells, int startX, int startY)
+    public IEnumerator<Operation> DfsWorst(MazeGenerator.Cell[][] cells, int startX, int startY)
     {
         int height = cells.Length;
         int width = cells[0].Length;
@@ -97,15 +97,15 @@ internal class Model
             {
                 var (vx, vy) = MazeGenerator.GetVector(dir);
 
-                int xx = x + vx;
-                int yy = y + vy;
+                int nextX = x + vx;
+                int nextY = y + vy;
 
-                if (cells[yy][xx] == MazeGenerator.Cell.Wall)
+                if (cells[nextY][nextX] == MazeGenerator.Cell.Wall)
                 {
                     continue;
                 }
 
-                Dfs(xx, yy, pathLength + 1);
+                Dfs(nextX, nextY, pathLength + 1);
             }
         }
     }
@@ -148,15 +148,15 @@ internal class Model
             {
                 var (vx, vy) = MazeGenerator.GetVector(dir);
 
-                int xx = x + vx;
-                int yy = y + vy;
+                int nextX = x + vx;
+                int nextY = y + vy;
 
-                if (cells[yy][xx] == MazeGenerator.Cell.Wall)
+                if (cells[nextY][nextX] == MazeGenerator.Cell.Wall)
                 {
                     continue;
                 }
 
-                queue.Enqueue((xx, yy, length + 1));
+                queue.Enqueue((nextX, nextY, length + 1));
             }
         }
 
@@ -216,26 +216,26 @@ internal class Model
             {
                 var (vx, vy) = MazeGenerator.GetVector(dir);
 
-                int xx = x + vx;
-                int yy = y + vy;
+                int nextX = x + vx;
+                int nextY = y + vy;
 
-                if (cells[yy][xx] == MazeGenerator.Cell.Wall)
+                if (cells[nextY][nextX] == MazeGenerator.Cell.Wall)
                 {
                     continue;
                 }
 
-                if (visited[yy][xx])
+                if (visited[nextY][nextX])
                 {
                     continue;
                 }
 
-                if (costs[yy][xx] <= costs[y][x] + 1)
+                if (costs[nextY][nextX] <= costs[y][x] + 1)
                 {
                     // 各辺の長さが1なのでここには来ない。
                     throw new NotImplementedException();
                 }
 
-                queue.Enqueue((xx, yy, cost + 1), cost + 1);
+                queue.Enqueue((nextX, nextY, cost + 1), cost + 1);
             }
         }
 
@@ -283,15 +283,15 @@ internal class Model
             {
                 var (vx, vy) = MazeGenerator.GetVector(dir);
 
-                int xx = x + vx;
-                int yy = y + vy;
+                int nextX = x + vx;
+                int nextY = y + vy;
 
-                if (cells[yy][xx] == MazeGenerator.Cell.Wall)
+                if (cells[nextY][nextX] == MazeGenerator.Cell.Wall)
                 {
                     continue;
                 }
 
-                queue.Enqueue((xx, yy, cost + 1), cost + 1 + CalcHeulisticCost(xx, yy));
+                queue.Enqueue((nextX, nextY, cost + 1), cost + 1 + CalcHeulisticCost(nextX, nextY));
             }
         }
 
@@ -306,7 +306,8 @@ internal class Model
 
 internal enum OperationType
 {
-    None, Complete,
+    None,
+    Complete,
     Open,
 }
 

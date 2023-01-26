@@ -7,10 +7,10 @@ public partial class UserControl1 : UserControl
     public UserControl1()
     {
         InitializeComponent();
-        RedoUndo = new RedoUndo<Operation>(ExecuteRedo, ExecuteUndo);
+        _redoUndo = new RedoUndo<Operation>(ExecuteRedo, ExecuteUndo);
     }
 
-    private Model Model { get; set; } = new();
+    private readonly Model _model = new();
 
     private bool _isProcessing = false;
 
@@ -33,12 +33,12 @@ public partial class UserControl1 : UserControl
 
         _isProcessing = true;
 
-        var enumerator = Model.Move(100);
+        var enumerator = _model.Move(100);
 
         while (enumerator.MoveNext() && _isProcessing)
         {
             var op = enumerator.Current;
-            RedoUndo.Execute(op);
+            _redoUndo.Execute(op);
 
             await Task.Delay(100);
         }
@@ -47,24 +47,24 @@ public partial class UserControl1 : UserControl
         _isProcessing = false;
     }
 
-    RedoUndo<Operation> RedoUndo { get; }
+    private readonly RedoUndo<Operation> _redoUndo;
 
     IEnumerator<Operation>? _enumerator;
-    IEnumerator<Operation>? Enumerator => _enumerator ??= Model.Move(10);
+    IEnumerator<Operation>? Enumerator => _enumerator ??= _model.Move(10);
 
     private void NextButton_Click(object sender, EventArgs e)
     {
-        if (RedoUndo.Redo())
+        if (_redoUndo.Redo())
         {
-            PreviousButton.Enabled = RedoUndo.CanUndo;
+            PreviousButton.Enabled = _redoUndo.CanUndo;
             return;
         }
 
         if (Enumerator?.MoveNext() is true)
         {
             var op = Enumerator.Current;
-            RedoUndo.Execute(op);
-            PreviousButton.Enabled = RedoUndo.CanUndo;
+            _redoUndo.Execute(op);
+            PreviousButton.Enabled = _redoUndo.CanUndo;
         }
         else
         {
@@ -74,9 +74,9 @@ public partial class UserControl1 : UserControl
 
     private void PreviousButton_Click(object sender, EventArgs e)
     {
-        if (RedoUndo.Undo())
+        if (_redoUndo.Undo())
         {
-            PreviousButton.Enabled = RedoUndo.CanUndo;
+            PreviousButton.Enabled = _redoUndo.CanUndo;
             return;
         }
     }

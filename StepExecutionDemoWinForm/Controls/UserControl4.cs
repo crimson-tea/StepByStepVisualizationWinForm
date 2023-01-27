@@ -182,17 +182,9 @@ public partial class UserControl4 : UserControl
             Application.DoEvents();
             cost--;
 
-            try
-            {
-                var (nx, ny) = s_vector.First(p => _costs[p.y + y][p.x + x] == cost);
-                x += nx;
-                y += ny;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
+            var (nx, ny) = s_vector.First(p => _costs[p.y + y][p.x + x] == cost);
+            x += nx;
+            y += ny;
         }
 
         Cells[y][x].BackColor = isUndo ? Color.DarkGray : Color.Green;
@@ -231,21 +223,21 @@ public partial class UserControl4 : UserControl
 
     void SetProgress(int currentStep) => StepLabel.Text = currentStep.ToString();
 
-    enum SeiveType { DfsBetter, DfsWorth, Bfs, Dijkstra, AStar }
-    private SeiveType _seive = SeiveType.DfsBetter;
-    int SeiveCount => Enum.GetNames<SeiveType>().Length;
+    enum SearchAlgolithmType { DfsBetter, DfsWorth, Bfs, Dijkstra, AStar }
+    private SearchAlgolithmType _searchAlgolithm = SearchAlgolithmType.DfsBetter;
+    int AlgolithmCount => Enum.GetNames<SearchAlgolithmType>().Length;
 
-    private void SwitchSeiveButton_Click(object sender, EventArgs e)
+    private void SwitchSieveButton_Click(object sender, EventArgs e)
     {
-        _seive = (SeiveType)(((int)_seive + 1) % SeiveCount);
+        _searchAlgolithm = (SearchAlgolithmType)(((int)_searchAlgolithm + 1) % AlgolithmCount);
 
-        (_enumerator, SearchTypeLabel.Text) = _seive switch
+        (_enumerator, SearchTypeLabel.Text) = _searchAlgolithm switch
         {
-            SeiveType.DfsBetter => (_model.DfsBetter(_maze, _startX, _startY), "DFS (better)"),
-            SeiveType.DfsWorth => (_model.DfsBetter(_maze, _startX, _startY, true), "DFS (worth)"),
-            SeiveType.Bfs => (_model.Bfs(_maze, _startX, _startY), "BFS"),
-            SeiveType.Dijkstra => (_model.Dijkstra(_maze, _startX, _startY), "Dijkstra"),
-            SeiveType.AStar => (_model.AStar(_maze, _startX, _startY), "A*"),
+            SearchAlgolithmType.DfsBetter => (_model.DfsBetter(_maze, _startX, _startY), "DFS (better)"),
+            SearchAlgolithmType.DfsWorth => (_model.DfsBetter(_maze, _startX, _startY, true), "DFS (worth)"),
+            SearchAlgolithmType.Bfs => (_model.Bfs(_maze, _startX, _startY), "BFS"),
+            SearchAlgolithmType.Dijkstra => (_model.Dijkstra(_maze, _startX, _startY), "Dijkstra"),
+            SearchAlgolithmType.AStar => (_model.AStar(_maze, _startX, _startY), "A*"),
             _ => throw new ArgumentException()
         };
 

@@ -31,10 +31,10 @@
             this.NextButton = new System.Windows.Forms.Button();
             this.PrevButton = new System.Windows.Forms.Button();
             this.AutoButton = new System.Windows.Forms.Button();
-            this.SwitchSeiveButton = new System.Windows.Forms.Button();
+            this.SwitchSieveButton = new System.Windows.Forms.Button();
             this.StepLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.SeiveTypeLabel = new System.Windows.Forms.Label();
+            this.SieveTypeLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // NextButton
@@ -67,15 +67,15 @@
             this.AutoButton.UseVisualStyleBackColor = true;
             this.AutoButton.Click += new System.EventHandler(this.AutoButton_Click);
             // 
-            // SwitchSeiveButton
+            // SwitchSieveButton
             // 
-            this.SwitchSeiveButton.Location = new System.Drawing.Point(276, 41);
-            this.SwitchSeiveButton.Name = "SwitchSeiveButton";
-            this.SwitchSeiveButton.Size = new System.Drawing.Size(75, 75);
-            this.SwitchSeiveButton.TabIndex = 3;
-            this.SwitchSeiveButton.Text = "Switch Seive";
-            this.SwitchSeiveButton.UseVisualStyleBackColor = true;
-            this.SwitchSeiveButton.Click += new System.EventHandler(this.SwitchSeiveButton_Click);
+            this.SwitchSieveButton.Location = new System.Drawing.Point(276, 41);
+            this.SwitchSieveButton.Name = "SwitchSieveButton";
+            this.SwitchSieveButton.Size = new System.Drawing.Size(75, 75);
+            this.SwitchSieveButton.TabIndex = 3;
+            this.SwitchSieveButton.Text = "Switch Sieve";
+            this.SwitchSieveButton.UseVisualStyleBackColor = true;
+            this.SwitchSieveButton.Click += new System.EventHandler(this.SwitchSieveButton_Click);
             // 
             // StepLabel
             // 
@@ -94,23 +94,23 @@
             this.label1.TabIndex = 4;
             this.label1.Text = "Step:";
             // 
-            // SeiveTypeLabel
+            // SieveTypeLabel
             // 
-            this.SeiveTypeLabel.AutoSize = true;
-            this.SeiveTypeLabel.Location = new System.Drawing.Point(277, 23);
-            this.SeiveTypeLabel.Name = "SeiveTypeLabel";
-            this.SeiveTypeLabel.Size = new System.Drawing.Size(74, 15);
-            this.SeiveTypeLabel.TabIndex = 6;
-            this.SeiveTypeLabel.Text = "Eratosthenes";
+            this.SieveTypeLabel.AutoSize = true;
+            this.SieveTypeLabel.Location = new System.Drawing.Point(277, 23);
+            this.SieveTypeLabel.Name = "SieveTypeLabel";
+            this.SieveTypeLabel.Size = new System.Drawing.Size(74, 15);
+            this.SieveTypeLabel.TabIndex = 6;
+            this.SieveTypeLabel.Text = "Eratosthenes";
             // 
             // UserControl3
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.SeiveTypeLabel);
+            this.Controls.Add(this.SieveTypeLabel);
             this.Controls.Add(this.StepLabel);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.SwitchSeiveButton);
+            this.Controls.Add(this.SwitchSieveButton);
             this.Controls.Add(this.AutoButton);
             this.Controls.Add(this.PrevButton);
             this.Controls.Add(this.NextButton);
@@ -127,9 +127,9 @@
         private Button NextButton;
         private Button PrevButton;
         private Button AutoButton;
-        private Button SwitchSeiveButton;
+        private Button SwitchSieveButton;
         private Label StepLabel;
         private Label label1;
-        private Label SeiveTypeLabel;
+        private Label SieveTypeLabel;
     }
 }

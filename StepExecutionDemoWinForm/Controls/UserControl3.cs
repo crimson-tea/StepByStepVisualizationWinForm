@@ -46,7 +46,7 @@ public partial class UserControl3 : UserControl
     private readonly RedoUndo<Operation> _redoUndo;
 
     private IEnumerator<Operation> _enumerator;
-    private IEnumerator<Operation> Enumerator => _enumerator ??= _model.SeiveOfEratosthenes(_length);
+    private IEnumerator<Operation> Enumerator => _enumerator ??= _model.SieveOfEratosthenes(_length);
 
     private bool _processing = false;
 
@@ -178,18 +178,18 @@ public partial class UserControl3 : UserControl
 
     void SetProgress(int currentStep) => StepLabel.Text = currentStep.ToString();
 
-    enum SeiveType { Eratosthenes, Atkin }
-    private SeiveType _seive = SeiveType.Eratosthenes;
-    int SeiveCountOfType => Enum.GetNames<SeiveType>().Length;
+    enum SieveType { Eratosthenes, Atkin }
+    private SieveType _sieve = SieveType.Eratosthenes;
+    int SieveCountOfType => Enum.GetNames<SieveType>().Length;
 
-    private void SwitchSeiveButton_Click(object sender, EventArgs e)
+    private void SwitchSieveButton_Click(object sender, EventArgs e)
     {
-        _seive = (SeiveType)(((int)_seive + 1) % SeiveCountOfType);
+        _sieve = (SieveType)(((int)_sieve + 1) % SieveCountOfType);
 
-        (_enumerator, SeiveTypeLabel.Text) = _seive switch
+        (_enumerator, SieveTypeLabel.Text) = _sieve switch
         {
-            SeiveType.Eratosthenes => (_model.SeiveOfEratosthenes(100), "Eratosthenes"),
-            SeiveType.Atkin => (_model.SeiveOfAtkin(100), "Atkin"),
+            SieveType.Eratosthenes => (_model.SieveOfEratosthenes(100), "Eratosthenes"),
+            SieveType.Atkin => (_model.SieveOfAtkin(100), "Atkin"),
             _ => throw new ArgumentException()
         };
 

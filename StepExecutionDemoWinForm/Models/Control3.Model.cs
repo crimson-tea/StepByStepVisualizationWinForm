@@ -4,7 +4,7 @@ namespace AnimationWinForm.Control3;
 
 internal class Model
 {
-    public IEnumerator<Operation> SeiveOfEratosthenes(int count)
+    public IEnumerator<Operation> SieveOfEratosthenes(int count)
     {
         bool[] isPrime = Enumerable.Repeat(true, count).ToArray();
 
@@ -33,7 +33,7 @@ internal class Model
         yield return new Operation(OperationType.Complete, -1, prev);
     }
 
-    public IEnumerator<Operation> SeiveOfAtkin(int n)
+    public IEnumerator<Operation> SieveOfAtkin(int n)
     {
         List<int> primes = new List<int>();
         int[] minFactor = Enumerable.Repeat(-1, n).ToArray();

@@ -5,10 +5,24 @@ namespace AnimationWinForm;
 
 public partial class UserControl3 : UserControl
 {
+    class RedoUndo : RedoUndo<Operation>
+    {
+        private readonly UserControl3 _control;
+
+        public RedoUndo(UserControl3 userControl3)
+        {
+            _control = userControl3;
+        }
+
+        protected override void RedoAction(Operation operation) => _control.ExecuteRedo(operation);
+        protected override void UndoAction(Operation operation) => _control.ExecuteUndo(operation);
+        protected override void SetProgress(int steps) => _control.SetProgress(steps);
+    }
+
     public UserControl3()
     {
         InitializeComponent();
-        _redoUndo = new RedoUndo<Operation>(ExecuteRedo, ExecuteUndo, SetProgress);
+        _redoUndo = new RedoUndo(this);
     }
 
     private readonly List<Label> _numbers = new();
@@ -43,6 +57,7 @@ public partial class UserControl3 : UserControl
     }
 
     readonly Model _model = new Model();
+
     private readonly RedoUndo<Operation> _redoUndo;
 
     private IEnumerator<Operation> _enumerator;

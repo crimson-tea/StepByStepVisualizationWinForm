@@ -5,10 +5,24 @@ namespace AnimationWinForm;
 
 public partial class UserControl2 : UserControl
 {
+    class RedoUndo : RedoUndo<Operation>
+    {
+        private readonly UserControl2 _control;
+
+        public RedoUndo(UserControl2 userControl2)
+        {
+            _control = userControl2;
+        }
+
+        protected override void RedoAction(Operation operation) => _control.ExecuteRedo(operation);
+        protected override void UndoAction(Operation operation) => _control.ExecuteUndo(operation);
+        protected override void SetProgress(int steps) { }
+    }
+
     public UserControl2()
     {
         InitializeComponent();
-        _redoUndo = new RedoUndo<BSOperation>(ExecuteRedo, ExecuteUndo);
+        _redoUndo = new RedoUndo(this);
     }
 
     public Image CreateBarImage(Size size, Brush brush)
@@ -53,11 +67,11 @@ public partial class UserControl2 : UserControl
         ResumeLayout();
     }
 
-    private readonly BSModel _model = new BSModel();
-    private readonly RedoUndo<BSOperation> _redoUndo;
+    private readonly Model _model = new Model();
+    private readonly RedoUndo<Operation> _redoUndo;
 
-    private IEnumerator<BSOperation> _enumerator;
-    private IEnumerator<BSOperation> Enumerator => _enumerator ??= _model.BinarySearch(Bars.Select(x => x.value).ToArray(), TARGET);
+    private IEnumerator<Operation> _enumerator;
+    private IEnumerator<Operation> Enumerator => _enumerator ??= _model.BinarySearch(Bars.Select(x => x.value).ToArray(), TARGET);
 
     private readonly Brush _defaultBrush = Brushes.White;
     private readonly Brush _outOfRangeBrush = Brushes.Gray;
@@ -86,11 +100,11 @@ public partial class UserControl2 : UserControl
         }
     }
 
-    private void ExecuteRedo(BSOperation op) => Execute(op);
+    private void ExecuteRedo(Operation op) => Execute(op);
 
-    private void ExecuteUndo(BSOperation op) => Execute(op, true);
+    private void ExecuteUndo(Operation op) => Execute(op, true);
 
-    private void Execute(BSOperation current, bool isUndo = false)
+    private void Execute(Operation current, bool isUndo = false)
     {
         var (type, fIndex, tIndex) = current;
 
@@ -98,15 +112,15 @@ public partial class UserControl2 : UserControl
 
         switch (type)
         {
-            case BSOperationType.None:
+            case OperationType.None:
                 break;
-            case BSOperationType.Complete:
+            case OperationType.Complete:
                 ResultLabel.Text = $"Result: {tIndex}";
                 break;
-            case BSOperationType.MoveLeft:
+            case OperationType.MoveLeft:
                 SetColor(Brushes.Red);
                 break;
-            case BSOperationType.MoveRight:
+            case OperationType.MoveRight:
                 SetColor(Brushes.Green);
                 break;
             default:

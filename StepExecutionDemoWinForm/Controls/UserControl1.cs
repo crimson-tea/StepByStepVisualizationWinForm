@@ -4,10 +4,23 @@ namespace AnimationWinForm;
 
 public partial class UserControl1 : UserControl
 {
+    class RedoUndo : RedoUndo<Operation>
+    {
+        private readonly UserControl1 _control;
+        public RedoUndo(UserControl1 control)
+        {
+            _control = control;
+        }
+
+        protected override void RedoAction(Operation operation) => _control.ExecuteRedo(operation);
+        protected override void UndoAction(Operation operation) => _control.ExecuteUndo(operation);
+        protected override void SetProgress(int steps) { }
+    }
+
     public UserControl1()
     {
         InitializeComponent();
-        _redoUndo = new RedoUndo<Operation>(ExecuteRedo, ExecuteUndo);
+        _redoUndo = new RedoUndo(this);
     }
 
     private readonly Model _model = new();
@@ -21,6 +34,7 @@ public partial class UserControl1 : UserControl
             _isProcessing = false;
             return;
         }
+
         if (StartButton.Text == "Start")
         {
             StartButton.Text = "Stop";
@@ -49,8 +63,8 @@ public partial class UserControl1 : UserControl
 
     private readonly RedoUndo<Operation> _redoUndo;
 
-    IEnumerator<Operation>? _enumerator;
-    IEnumerator<Operation>? Enumerator => _enumerator ??= _model.Move(10);
+    private IEnumerator<Operation>? _enumerator;
+    private IEnumerator<Operation>? Enumerator => _enumerator ??= _model.Move(10);
 
     private void NextButton_Click(object sender, EventArgs e)
     {
@@ -82,9 +96,9 @@ public partial class UserControl1 : UserControl
     }
 
     private void ExecuteRedo(Operation op) => Execute(op.OperationType, op.To);
-    private void ExecuteUndo(Operation op) => Execute(op.OperationType, op.From, true);
+    private void ExecuteUndo(Operation op) => Execute(op.OperationType, op.From);
 
-    private void Execute(OperationType operationType, int x, bool isUndo = false)
+    private void Execute(OperationType operationType, int x)
     {
         switch (operationType)
         {

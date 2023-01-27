@@ -36,17 +36,17 @@
             // 
             // PreviousButton
             // 
-            this.PreviousButton.Location = new System.Drawing.Point(174, 148);
+            this.PreviousButton.Location = new System.Drawing.Point(3, 212);
             this.PreviousButton.Name = "PreviousButton";
             this.PreviousButton.Size = new System.Drawing.Size(75, 23);
             this.PreviousButton.TabIndex = 9;
-            this.PreviousButton.Text = "Previous";
+            this.PreviousButton.Text = "Prev";
             this.PreviousButton.UseVisualStyleBackColor = true;
             this.PreviousButton.Click += new System.EventHandler(this.PreviousButton_Click);
             // 
             // NextButton
             // 
-            this.NextButton.Location = new System.Drawing.Point(255, 148);
+            this.NextButton.Location = new System.Drawing.Point(84, 212);
             this.NextButton.Name = "NextButton";
             this.NextButton.Size = new System.Drawing.Size(75, 23);
             this.NextButton.TabIndex = 8;
@@ -56,7 +56,7 @@
             // 
             // StartButton
             // 
-            this.StartButton.Location = new System.Drawing.Point(6, 148);
+            this.StartButton.Location = new System.Drawing.Point(165, 212);
             this.StartButton.Name = "StartButton";
             this.StartButton.Size = new System.Drawing.Size(75, 23);
             this.StartButton.TabIndex = 7;
@@ -83,7 +83,7 @@
             this.Controls.Add(this.StartButton);
             this.Controls.Add(this.label1);
             this.Name = "UserControl1";
-            this.Size = new System.Drawing.Size(333, 175);
+            this.Size = new System.Drawing.Size(366, 238);
             this.ResumeLayout(false);
             this.PerformLayout();
 

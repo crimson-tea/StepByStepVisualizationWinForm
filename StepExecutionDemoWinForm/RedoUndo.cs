@@ -26,6 +26,7 @@ internal abstract class RedoUndo<TOperation>
     {
         _redo.Clear();
         _undo.Push(op);
+        SetProgress(_undo.Count);
         RedoAction(op);
     }
 
@@ -42,6 +43,7 @@ internal abstract class RedoUndo<TOperation>
 
         var op = _redo.Pop();
         _undo.Push(op);
+        SetProgress(_undo.Count);
         RedoAction(op);
 
         return true;
@@ -60,6 +62,7 @@ internal abstract class RedoUndo<TOperation>
 
         var op = _undo.Pop();
         _redo.Push(op);
+        SetProgress(_undo.Count);
         UndoAction(op);
 
         return true;
@@ -72,5 +75,6 @@ internal abstract class RedoUndo<TOperation>
     {
         _redo.Clear();
         _undo.Clear();
+        SetProgress(_undo.Count);
     }
 }

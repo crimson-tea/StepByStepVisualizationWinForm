@@ -24,11 +24,13 @@
 
 ### 使い方
 #### 事前準備
-このリポジトリのコードをDownloadZipでダウンロードします。
+##### githubのサイトを利用する方法
+[このリポジトリ](https://github.com/crimson-tea/StepByStepVisualizationWinForm)のコードをDownloadZipでダウンロードします。
 
 ダウンロードしたファイルを展開します。
 
-gitを利用する方法
+##### gitを利用する方法
+以下のコマンドを実行します。
 ```
 git clone https://github.com/crimson-tea/StepByStepVisualizationWinForm.git
 cd StepByStepVisualizationWinForm/StepByStepVisualizationWinForm/

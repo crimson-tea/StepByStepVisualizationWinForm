@@ -302,6 +302,109 @@ internal class Model
             return Math.Abs(goalX - x) + Math.Abs(goalY - y);
         }
     }
+
+    public IEnumerator<Operation> AStarWithPerfectHeuristic(MazeGenerator.Cell[][] cells, int startX, int startY)
+    {
+        int height = cells.Length;
+        int width = cells[0].Length;
+
+        int goalX = width - 2;
+        int goalY = height - 2;
+
+        PriorityQueue<(int x, int y, int cost), int> queue = new();
+        queue.Enqueue((startX, startY, 0), 0);
+
+        bool[][] visited = new bool[cells.Length][];
+        for (int i = 0; i < visited.Length; i++)
+        {
+            visited[i] = new bool[cells[i].Length];
+        }
+
+        Point prev = Point.Empty;
+
+        while (queue.Count > 0)
+        {
+            var (x, y, cost) = queue.Dequeue();
+
+            if (visited[y][x])
+            {
+                continue;
+            }
+
+            visited[y][x] = true;
+            yield return new Operation(OperationType.Open, new Point(x, y), prev, cost);
+            prev = new Point(x, y);
+
+            if (cells[y][x] == MazeGenerator.Cell.Goal)
+            {
+                break;
+            }
+
+            foreach (var dir in MazeGenerator.Directions)
+            {
+                var (vx, vy) = MazeGenerator.GetVector(dir);
+
+                int nextX = x + vx;
+                int nextY = y + vy;
+
+                if (cells[nextY][nextX] == MazeGenerator.Cell.Wall)
+                {
+                    continue;
+                }
+
+                queue.Enqueue((nextX, nextY, cost + 1), cost + 1 + CalcHeulisticCost(nextX, nextY));
+            }
+        }
+
+        yield return new Operation(OperationType.Complete, Previous: prev);
+
+        // 幅優先探索で現在地からゴールまでのコストを完璧に評価する
+        int CalcHeulisticCost(int startX, int startY)
+        {
+            int[][] field = new int[height][];
+            for (int i = 0; i < field.Length; i++)
+            {
+                field[i] = new int[width];
+            }
+
+            bool[] visited = new bool[width * height];
+
+            var queue = new Queue<(int x, int y, int cost)>();
+            queue.Enqueue((startX, startY, 1));
+            while (queue.Count > 0)
+            {
+                var(x, y, cost) =  queue.Dequeue();
+
+                if (visited[y * width + x])
+                {
+                    continue;
+                }
+                visited[y * width + x] = true;
+
+                if (cells[y][x] == MazeGenerator.Cell.Goal)
+                {
+                    return cost;
+                }
+
+                foreach (var dir in MazeGenerator.Directions)
+                {
+                    var (vx, vy) = MazeGenerator.GetVector(dir);
+
+                    int nextX = x + vx;
+                    int nextY = y + vy;
+
+                    if (cells[nextY][nextX] == MazeGenerator.Cell.Wall)
+                    {
+                        continue;
+                    }
+
+                    queue.Enqueue((nextX, nextY, cost + 1));
+                }
+            }
+
+            throw new Exception();
+        }
+    }
 }
 
 internal enum OperationType

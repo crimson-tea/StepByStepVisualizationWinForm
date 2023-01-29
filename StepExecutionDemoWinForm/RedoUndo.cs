@@ -1,9 +1,11 @@
-﻿namespace AnimationWinForm;
+﻿using StepExecutionDemoWinForm;
+
+namespace AnimationWinForm;
 
 /// <summary>
 /// RedoUndoを実装します。
 /// </summary>
-internal abstract class RedoUndo<TOperation>
+internal abstract class RedoUndoBase<TOperation>
 {
     private Stack<TOperation> _undo;
     private Stack<TOperation> _redo;
@@ -12,7 +14,7 @@ internal abstract class RedoUndo<TOperation>
     protected abstract void SetProgress(int steps);
 
     /// <param name="initCapacity">RedoとUndoに使われるスタックの大きさを指定します。RedoとUndoそれぞれこのキャパシティで初期化されます。</param>
-    public RedoUndo(int initCapacity = 65535)
+    public RedoUndoBase(int initCapacity = 65535)
     {
         _redo = new Stack<TOperation>(initCapacity);
         _undo = new Stack<TOperation>(initCapacity);
@@ -77,4 +79,18 @@ internal abstract class RedoUndo<TOperation>
         _undo.Clear();
         SetProgress(_undo.Count);
     }
+}
+
+class RedoUndo<TOperation> : RedoUndoBase<TOperation>
+{
+    private readonly IRedoUndo<TOperation> _control;
+
+    public RedoUndo(IRedoUndo<TOperation> control)
+    {
+        _control = control;
+    }
+
+    protected override void RedoAction(TOperation operation) => _control.ExecuteRedo(operation);
+    protected override void UndoAction(TOperation operation) => _control.ExecuteUndo(operation);
+    protected override void SetProgress(int steps) => _control.SetProgress(steps);
 }

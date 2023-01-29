@@ -1,28 +1,15 @@
 ﻿using AnimationWinForm.Control2;
+using StepExecutionDemoWinForm;
 using System.Diagnostics;
 
 namespace AnimationWinForm;
 
-public partial class UserControl2 : UserControl
+public partial class UserControl2 : UserControl, IRedoUndo<Operation>
 {
-    class RedoUndo : RedoUndo<Operation>
-    {
-        private readonly UserControl2 _control;
-
-        public RedoUndo(UserControl2 userControl2)
-        {
-            _control = userControl2;
-        }
-
-        protected override void RedoAction(Operation operation) => _control.ExecuteRedo(operation);
-        protected override void UndoAction(Operation operation) => _control.ExecuteUndo(operation);
-        protected override void SetProgress(int steps) { }
-    }
-
     public UserControl2()
     {
         InitializeComponent();
-        _redoUndo = new RedoUndo(this);
+        _redoUndo = new RedoUndo<Operation>(this);
     }
 
     public Image CreateBarImage(Size size, Brush brush)
@@ -160,6 +147,10 @@ public partial class UserControl2 : UserControl
             }
         }
     }
+
+    void IRedoUndo<Operation>.ExecuteRedo(Operation operation) => ExecuteRedo(operation);
+    void IRedoUndo<Operation>.ExecuteUndo(Operation operation) => ExecuteUndo(operation);
+    void IRedoUndo<Operation>.SetProgress(int step) { }
 }
 
 public static class Extensions

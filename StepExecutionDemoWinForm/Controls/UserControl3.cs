@@ -1,28 +1,15 @@
 ﻿using AnimationWinForm.Control3;
+using StepExecutionDemoWinForm;
 using System.Diagnostics;
 
 namespace AnimationWinForm;
 
-public partial class UserControl3 : UserControl
+public partial class UserControl3 : UserControl, IRedoUndo<Operation>
 {
-    class RedoUndo : RedoUndo<Operation>
-    {
-        private readonly UserControl3 _control;
-
-        public RedoUndo(UserControl3 userControl3)
-        {
-            _control = userControl3;
-        }
-
-        protected override void RedoAction(Operation operation) => _control.ExecuteRedo(operation);
-        protected override void UndoAction(Operation operation) => _control.ExecuteUndo(operation);
-        protected override void SetProgress(int steps) => _control.SetProgress(steps);
-    }
-
     public UserControl3()
     {
         InitializeComponent();
-        _redoUndo = new RedoUndo(this);
+        _redoUndo = new RedoUndo<Operation>(this);
     }
 
     private readonly List<Label> _numbers = new();
@@ -191,7 +178,7 @@ public partial class UserControl3 : UserControl
         }
     }
 
-    void SetProgress(int currentStep) => StepLabel.Text = currentStep.ToString();
+    private void SetProgress(int currentStep) => StepLabel.Text = currentStep.ToString();
 
     enum SieveType { Eratosthenes, Atkin }
     private SieveType _sieve = SieveType.Eratosthenes;
@@ -225,4 +212,8 @@ public partial class UserControl3 : UserControl
             _sieveCount[i] = 0;
         }
     }
+
+    void IRedoUndo<Operation>.ExecuteRedo(Operation operation) => ExecuteRedo(operation);
+    void IRedoUndo<Operation>.ExecuteUndo(Operation operation) => ExecuteUndo(operation);
+    void IRedoUndo<Operation>.SetProgress(int step) => SetProgress(step);
 }

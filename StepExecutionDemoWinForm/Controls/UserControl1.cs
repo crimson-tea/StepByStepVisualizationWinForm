@@ -1,26 +1,14 @@
 ﻿using AnimationWinForm.Control1;
+using StepExecutionDemoWinForm;
 
 namespace AnimationWinForm;
 
-public partial class UserControl1 : UserControl
+public partial class UserControl1 : UserControl, IRedoUndo<Operation>
 {
-    class RedoUndo : RedoUndo<Operation>
-    {
-        private readonly UserControl1 _control;
-        public RedoUndo(UserControl1 control)
-        {
-            _control = control;
-        }
-
-        protected override void RedoAction(Operation operation) => _control.ExecuteRedo(operation);
-        protected override void UndoAction(Operation operation) => _control.ExecuteUndo(operation);
-        protected override void SetProgress(int steps) { }
-    }
-
     public UserControl1()
     {
         InitializeComponent();
-        _redoUndo = new RedoUndo(this);
+        _redoUndo = new RedoUndo<Operation>(this);
     }
 
     private readonly Model _model = new();
@@ -114,4 +102,8 @@ public partial class UserControl1 : UserControl
                 break;
         }
     }
+
+    void IRedoUndo<Operation>.ExecuteRedo(Operation operation) => ExecuteRedo(operation);
+    void IRedoUndo<Operation>.ExecuteUndo(Operation operation) => ExecuteUndo(operation);
+    void IRedoUndo<Operation>.SetProgress(int step) { }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace StepExecutionWinForm
+namespace StepByStepVisualizationWinForm
 {
     internal class MazeGenerator
     {

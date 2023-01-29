@@ -1,4 +1,4 @@
-namespace AnimationWinForm;
+namespace StepByStepVisualizationWinForm;
 
 internal static class Program
 {

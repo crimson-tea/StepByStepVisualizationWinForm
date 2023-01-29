@@ -1,6 +1,4 @@
-﻿using StepExecutionDemoWinForm;
-
-namespace AnimationWinForm;
+﻿namespace StepByStepVisualizationWinForm;
 
 /// <summary>
 /// RedoUndoを実装します。

@@ -1,6 +1,4 @@
-﻿using StepExecutionWinForm;
-
-namespace AnimationWinForm.Control4;
+﻿namespace StepByStepVisualizationWinForm.Control4;
 
 internal class Model
 {

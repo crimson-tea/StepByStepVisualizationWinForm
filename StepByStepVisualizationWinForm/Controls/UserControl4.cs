@@ -1,9 +1,7 @@
-﻿using AnimationWinForm.Control4;
-using StepExecutionDemoWinForm;
-using StepExecutionWinForm;
+﻿using StepByStepVisualizationWinForm.Control4;
 using System.Diagnostics;
 
-namespace AnimationWinForm;
+namespace StepByStepVisualizationWinForm;
 
 public partial class UserControl4 : UserControl, IRedoUndo<Operation>
 {

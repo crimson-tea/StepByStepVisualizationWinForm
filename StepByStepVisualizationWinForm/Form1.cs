@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace AnimationWinForm;
+namespace StepByStepVisualizationWinForm;
 
 public partial class Form1 : Form
 {

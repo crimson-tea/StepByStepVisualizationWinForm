@@ -1,4 +1,4 @@
-﻿namespace AnimationWinForm.Control1;
+﻿namespace StepByStepVisualizationWinForm.Control1;
 
 internal class Model
 {

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace AnimationWinForm.Control3;
+namespace StepByStepVisualizationWinForm.Control3;
 
 internal class Model
 {

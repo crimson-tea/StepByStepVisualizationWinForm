@@ -1,4 +1,4 @@
-﻿namespace AnimationWinForm
+﻿namespace StepByStepVisualizationWinForm
 {
     partial class UserControl3
     {

@@ -55,7 +55,7 @@ internal class Model
             }
         }
 
-        yield return new Operation(OperationType.Complete, previous: prev);
+        yield return new Operation(OperationType.Complete, Previous: prev);
     }
 
     public IEnumerator<Operation> DfsWorst(MazeGenerator.Cell[][] cells, int startX, int startY)
@@ -79,7 +79,7 @@ internal class Model
             yield return item;
         }
 
-        yield return new Operation(OperationType.Complete, previous: prev);
+        yield return new Operation(OperationType.Complete, Previous: prev);
 
         void Dfs(int x, int y, int pathLength)
         {
@@ -160,7 +160,7 @@ internal class Model
             }
         }
 
-        yield return new Operation(OperationType.Complete, previous: prev);
+        yield return new Operation(OperationType.Complete, Previous: prev);
     }
 
     public IEnumerator<Operation> Dijkstra(MazeGenerator.Cell[][] cells, int startX, int startY)
@@ -239,7 +239,7 @@ internal class Model
             }
         }
 
-        yield return new Operation(OperationType.Complete, previous: prev);
+        yield return new Operation(OperationType.Complete, Previous: prev);
     }
 
     public IEnumerator<Operation> AStar(MazeGenerator.Cell[][] cells, int startX, int startY)
@@ -295,7 +295,7 @@ internal class Model
             }
         }
 
-        yield return new Operation(OperationType.Complete, previous: prev);
+        yield return new Operation(OperationType.Complete, Previous: prev);
 
         int CalcHeulisticCost(int x, int y)
         {
@@ -311,27 +311,7 @@ internal enum OperationType
     Open,
 }
 
-internal class Operation
-{
-    public OperationType Type { get; set; }
-    public Point Current { get; }
-    public Point Previous { get; }
-    public int PathLength { get; }
-
-    public Operation(OperationType type, Point current = default, Point previous = default, int pathLength = 0)
-    {
-        Type = type;
-        Current = current;
-        Previous = previous;
-        PathLength = pathLength;
-    }
-
-    public void Deconstruct(out OperationType type, out Point current, out Point previous, out int pathLength) => (type, current, previous, pathLength) = (Type, Current, Previous, PathLength);
-    public override string ToString()
-    {
-        return $"{Type} (x, y) = ({Current}, {Previous}) length: {PathLength}";
-    }
-}
+internal record Operation(OperationType OperationType, Point Current = default, Point Previous = default, int PathLength = 0);
 
 public static class PointExtensions
 {

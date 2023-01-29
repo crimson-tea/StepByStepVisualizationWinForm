@@ -28,21 +28,4 @@ internal class Model
 
 internal enum OperationType { None, Complete, MoveLeft, MoveRight }
 
-internal class Operation
-{
-    public OperationType Type { get; set; }
-    public int From { get; set; }
-    public int To { get; set; }
-    public Operation(OperationType type, int from, int to)
-    {
-        Type = type;
-        From = from;
-        To = to;
-    }
-
-    public void Deconstruct(out OperationType type, out int from, out int to) => (type, from, to) = (Type, From, To);
-    public override string ToString()
-    {
-        return $"{Type} from: {From} to: {To}";
-    }
-}
+internal record Operation(OperationType OperationType, int From , int To);

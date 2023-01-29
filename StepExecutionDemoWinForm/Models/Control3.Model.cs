@@ -79,21 +79,4 @@ internal enum OperationType
     MarkPrime
 }
 
-internal class Operation
-{
-    public OperationType Type { get; set; }
-    public int Target { get; set; }
-    public int Prev { get; set; }
-    public Operation(OperationType type, int target, int prev)
-    {
-        Type = type;
-        Target = target;
-        Prev = prev;
-    }
-
-    public void Deconstruct(out OperationType type, out int target, out int prev) => (type, target, prev) = (Type, Target, Prev);
-    public override string ToString()
-    {
-        return $"{Type} target: {Target} prev: {Prev}";
-    }
-}
+internal record Operation(OperationType OperationType, int Target, int Prev);

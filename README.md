@@ -23,18 +23,27 @@
 * .NET 6.0 以上
 
 ### 使い方
-#### Visual Studio
+#### 事前準備
 このリポジトリのコードをDownloadZipでダウンロードします。
+ダウンロードしたファイルを展開します。
 
-ダウンロードしたファイルを展開し、`StepByStepVisualizationWinForm.sln`ファイルをVisualStudioで開いてください。
-
-#### Visual Studio Code
-ターミナルより、以下のコマンドで起動できます。
+gitを利用する方法
 ```
-clone https://github.com/crimson-tea/StepByStepVisualizationWinForm.git
+git clone https://github.com/crimson-tea/StepByStepVisualizationWinForm.git
 cd StepByStepVisualizationWinForm/StepByStepVisualizationWinForm/
+```
+
+#### Visual Studioを利用して起動
+`StepByStepVisualizationWinForm.sln`ファイルをVisualStudioで開いてください。
+`F5`キーでアプリケーションが起動します。
+
+#### コマンドを利用して起動
+`StepByStepVisualizationWinForm.csproj`が存在するディレクトリへ移動し、
+```
 dotnet run
 ```
+を実行してください。
+
 dotnetコマンドが利用できない方は[こちらのインストール方法](https://learn.microsoft.com/ja-jp/dotnet/core/install/windows?tabs=net70)をご確認ください。
 
 ### こだわりポイント

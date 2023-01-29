@@ -25,6 +25,7 @@
 ### 使い方
 #### 事前準備
 このリポジトリのコードをDownloadZipでダウンロードします。
+
 ダウンロードしたファイルを展開します。
 
 gitを利用する方法
@@ -35,6 +36,7 @@ cd StepByStepVisualizationWinForm/StepByStepVisualizationWinForm/
 
 #### Visual Studioを利用して起動
 `StepByStepVisualizationWinForm.sln`ファイルをVisualStudioで開いてください。
+
 `F5`キーでアプリケーションが起動します。
 
 #### コマンドを利用して起動

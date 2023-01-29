@@ -1,28 +1,16 @@
 ﻿using AnimationWinForm.Control4;
+using StepExecutionDemoWinForm;
 using StepExecutionWinForm;
 using System.Diagnostics;
 
 namespace AnimationWinForm;
 
-public partial class UserControl4 : UserControl
+public partial class UserControl4 : UserControl, IRedoUndo<Operation>
 {
-    class RedoUndo : RedoUndo<Operation>
-    {
-        private readonly UserControl4 _control;
-        public RedoUndo(UserControl4 control)
-        {
-            _control = control;
-        }
-
-        protected override void RedoAction(Operation operation) => _control.ExecuteRedo(operation);
-        protected override void UndoAction(Operation operation) => _control.ExecuteUndo(operation);
-        protected override void SetProgress(int steps) => _control.SetProgress(steps);
-    }
-
     public UserControl4()
     {
         InitializeComponent();
-        _redoUndo = new RedoUndo(this);
+        _redoUndo = new RedoUndo<Operation>(this);
     }
 
     List<List<Label>> Cells { get; } = new();
@@ -300,4 +288,8 @@ public partial class UserControl4 : UserControl
     {
         InitMaze();
     }
+
+    void IRedoUndo<Operation>.ExecuteRedo(Operation operation) => ExecuteRedo(operation);
+    void IRedoUndo<Operation>.ExecuteUndo(Operation operation) => ExecuteUndo(operation);
+    void IRedoUndo<Operation>.SetProgress(int step) => SetProgress(step);
 }

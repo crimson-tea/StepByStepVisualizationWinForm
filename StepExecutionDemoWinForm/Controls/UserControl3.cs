@@ -63,39 +63,40 @@ public partial class UserControl3 : UserControl
     private IEnumerator<Operation> _enumerator;
     private IEnumerator<Operation> Enumerator => _enumerator ??= _model.SieveOfEratosthenes(_length);
 
-    private bool _processing = false;
+    private bool _isProcessing = false;
 
     private async void AutoButton_Click(object sender, EventArgs e)
     {
         var b = (Button)sender;
 
-        if (_processing)
+        if (_isProcessing)
         {
-            _processing = false;
+            _isProcessing = false;
             return;
         }
 
-        _processing = true;
+        _isProcessing = true;
         b.Text = "Stop";
 
-        while (_processing && _redoUndo.Redo())
+        while (_isProcessing && _redoUndo.Redo())
         {
             await Task.Delay(100);
         }
 
-        while (_processing && Enumerator.MoveNext())
+        while (_isProcessing && Enumerator.MoveNext())
         {
             var op = Enumerator.Current;
             _redoUndo.Execute(op);
             await Task.Delay(100);
         }
 
-        _processing = false;
+        _isProcessing = false;
         b.Text = "Auto";
     }
 
     private void NextButton_Click(object sender, EventArgs e)
     {
+        if (_isProcessing) { return; }
         if (_redoUndo.Redo())
         {
             return;
@@ -110,6 +111,7 @@ public partial class UserControl3 : UserControl
 
     private void PrevButton_Click(object sender, EventArgs e)
     {
+        if (_isProcessing) { return; }
         if (_redoUndo.Undo())
         {
             return;
@@ -191,7 +193,7 @@ public partial class UserControl3 : UserControl
         }
     }
 
-    void SetProgress(int currentStep) => StepLabel.Text = currentStep.ToString();
+    private void SetProgress(int currentStep) => StepLabel.Text = currentStep.ToString();
 
     enum SieveType { Eratosthenes, Atkin }
     private SieveType _sieve = SieveType.Eratosthenes;

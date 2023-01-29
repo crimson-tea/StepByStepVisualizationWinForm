@@ -87,27 +87,27 @@ public partial class UserControl4 : UserControl
     private IEnumerator<Operation> _enumerator;
     private IEnumerator<Operation> Enumerator => _enumerator ??= _model.DfsBetter(_maze, _startX, _startY);
 
-    private bool _processing = false;
+    private bool _isProcessing = false;
     private void AutoButton_Click(object sender, EventArgs e)
     {
         var button = (Button)sender;
 
-        if (_processing)
+        if (_isProcessing)
         {
-            _processing = false;
+            _isProcessing = false;
             return;
         }
 
-        _processing = true;
+        _isProcessing = true;
         button.Text = "Stop";
 
-        while (_processing && _redoUndo.Redo())
+        while (_isProcessing && _redoUndo.Redo())
         {
             Application.DoEvents();
         }
 
         int count = 0;
-        while (_processing && Enumerator.MoveNext())
+        while (_isProcessing && Enumerator.MoveNext())
         {
             var op = Enumerator.Current;
             _redoUndo.Execute(op);
@@ -119,12 +119,13 @@ public partial class UserControl4 : UserControl
             }
         }
 
-        _processing = false;
+        _isProcessing = false;
         button.Text = "Auto";
     }
 
     private void NextButton_Click(object sender, EventArgs e)
     {
+        if (_isProcessing) { return; }
         if (_redoUndo.Redo())
         {
             return;
@@ -139,12 +140,37 @@ public partial class UserControl4 : UserControl
 
     private void PrevButton_Click(object sender, EventArgs e)
     {
+        if (_isProcessing) { return; }
         if (_redoUndo.Undo())
         {
             return;
         }
     }
 
+    private static (int x, int y)[] s_vector = new (int x, int y)[]
+    {
+        (0, 1),
+        (1, 0),
+        (0, -1),
+        (-1, 0),
+    };
+
+    private void DrawPath(int x, int y, bool isUndo = false)
+    {
+        int cost = _costs[y][x];
+        while (x != 1 || y != 1)
+        {
+            Cells[y][x].BackColor = isUndo ? Color.DarkGray : Color.Green;
+            Application.DoEvents();
+            cost--;
+
+            var (nx, ny) = s_vector.First(p => _costs[p.y + y][p.x + x] == cost);
+            x += nx;
+            y += ny;
+        }
+
+        Cells[y][x].BackColor = isUndo ? Color.DarkGray : Color.Green;
+    }
     private void ExecuteRedo(Operation op)
     {
         var (type, current, prev, cost) = op;
@@ -177,32 +203,6 @@ public partial class UserControl4 : UserControl
                 break;
         }
     }
-
-    private static (int x, int y)[] s_vector = new (int x, int y)[]
-    {
-        (0, 1),
-        (1, 0),
-        (0, -1),
-        (-1, 0),
-    };
-
-    private void DrawPath(int x, int y, bool isUndo = false)
-    {
-        int cost = _costs[y][x];
-        while (x != 1 || y != 1)
-        {
-            Cells[y][x].BackColor = isUndo ? Color.DarkGray : Color.Green;
-            Application.DoEvents();
-            cost--;
-
-            var (nx, ny) = s_vector.First(p => _costs[p.y + y][p.x + x] == cost);
-            x += nx;
-            y += ny;
-        }
-
-        Cells[y][x].BackColor = isUndo ? Color.DarkGray : Color.Green;
-    }
-
     private void ExecuteUndo(Operation op)
     {
         var (type, current, prev, _) = op;
@@ -234,7 +234,7 @@ public partial class UserControl4 : UserControl
         }
     }
 
-    void SetProgress(int currentStep) => StepLabel.Text = currentStep.ToString();
+    private void SetProgress(int currentStep) => StepLabel.Text = currentStep.ToString();
 
     enum SearchAlgolithmType { DfsBetter, DfsWorth, Bfs, Dijkstra, AStar }
     private SearchAlgolithmType _searchAlgolithm = SearchAlgolithmType.DfsBetter;

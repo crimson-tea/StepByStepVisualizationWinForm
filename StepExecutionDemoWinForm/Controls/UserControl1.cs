@@ -68,6 +68,7 @@ public partial class UserControl1 : UserControl
 
     private void NextButton_Click(object sender, EventArgs e)
     {
+        if (_isProcessing) { return; }
         if (_redoUndo.Redo())
         {
             PreviousButton.Enabled = _redoUndo.CanUndo;
@@ -88,6 +89,7 @@ public partial class UserControl1 : UserControl
 
     private void PreviousButton_Click(object sender, EventArgs e)
     {
+        if (_isProcessing) { return; }
         if (_redoUndo.Undo())
         {
             PreviousButton.Enabled = _redoUndo.CanUndo;

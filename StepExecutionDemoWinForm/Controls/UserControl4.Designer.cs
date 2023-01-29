@@ -82,8 +82,9 @@
             this.StepLabel.AutoSize = true;
             this.StepLabel.Location = new System.Drawing.Point(316, 120);
             this.StepLabel.Name = "StepLabel";
-            this.StepLabel.Size = new System.Drawing.Size(0, 15);
+            this.StepLabel.Size = new System.Drawing.Size(13, 15);
             this.StepLabel.TabIndex = 5;
+            this.StepLabel.Text = "0";
             // 
             // label1
             // 

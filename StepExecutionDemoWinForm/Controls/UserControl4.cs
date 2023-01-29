@@ -236,7 +236,7 @@ public partial class UserControl4 : UserControl
 
     private void SetProgress(int currentStep) => StepLabel.Text = currentStep.ToString();
 
-    enum SearchAlgolithmType { DfsBetter, DfsWorth, Bfs, Dijkstra, AStar }
+    enum SearchAlgolithmType { DfsBetter, DfsWorth, Bfs, Dijkstra, AStar, PerfectAStar }
     private SearchAlgolithmType _searchAlgolithm = SearchAlgolithmType.DfsBetter;
     int AlgolithmCount => Enum.GetNames<SearchAlgolithmType>().Length;
 
@@ -251,6 +251,7 @@ public partial class UserControl4 : UserControl
             SearchAlgolithmType.Bfs => (_model.Bfs(_maze, _startX, _startY), "BFS"),
             SearchAlgolithmType.Dijkstra => (_model.Dijkstra(_maze, _startX, _startY), "Dijkstra"),
             SearchAlgolithmType.AStar => (_model.AStar(_maze, _startX, _startY), "A*"),
+            SearchAlgolithmType.PerfectAStar => (_model.AStarWithPerfectHeuristic(_maze, _startX, _startY), "A* (Perfect)"),
             _ => throw new ArgumentException()
         };
 

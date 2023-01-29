@@ -1,6 +1,6 @@
-# StepExecutionWinForm
+# StepByStepVisualizationWinForm
 
-### RedoUndoを利用したステップ実行の実装デモ
+### RedoUndoを利用してアルゴリズムの各段階を可視化しました
 
 1. RedoUndoのデモ
 2. BinarySearch
@@ -25,7 +25,8 @@
 このリポジトリをクローンしてVisualStudioやdotnetコマンドなどでビルドしてください。
 
 ### こだわりポイント
-RedoUndoの実装方法を工夫して一部継承に頼らないポリモーフィズムを実現しています。
+RedoUndoの実装方法を工夫して、少しのコードでRedoUndoが利用できるようにしています。
+
 
 ### 今後の計画
 WPFやblazorでも同様のことができないか試したいと考えています。

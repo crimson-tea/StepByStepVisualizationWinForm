@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using StepByStepVisualizationWinForm.Controls;
 
 namespace StepByStepVisualizationWinForm;
 

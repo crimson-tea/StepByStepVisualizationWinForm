@@ -9,45 +9,21 @@ internal record struct Model(string Text, BigInteger Value)
 
 internal class BinaryToDecimalConverter
 {
-    public static Model ChangeState(Model model, Operation operation, bool toNextState) => toNextState switch
+    public static Model ChangeState(Model model, Operation operation, bool toNextState) => (operation.OperationType, toNextState) switch
     {
-        true => NextState(model, operation),
-        false => PrevState(model, operation),
+        (OperationType.Append, true) => Append(model.Text, model.Value, operation.Number),
+        (OperationType.Append, false) => Delete(model.Text, model.Value),
+        (OperationType.Delete, true) => Delete(model.Text, model.Value),
+        (OperationType.Delete, false) => Append(model.Text, model.Value, operation.Number),
+        _ => throw new ArgumentException(nameof(operation.OperationType))
     };
 
-    public static Model NextState(Model model, Operation operation)
-    {
-        var (text, value) = model;
-        var (op, number) = operation;
-
-        var (nextText, nextValue) = op switch
-        {
-            OperationType.Append => ($"{text}{(int)number}", (value << 1) + (int)number),
-            OperationType.Delete => (text[..^1], value >> 1),
-            _ => throw new ArgumentException(nameof(operation)),
-        };
-
-        return new(nextText, nextValue);
-    }
-
-    public static Model PrevState(Model model, Operation operation)
-    {
-        var (text, value) = model;
-        var (op, number) = operation;
-
-        var (nextText, nextValue) = op switch
-        {
-            OperationType.Append => (text[..^1], value >> 1),
-            OperationType.Delete => ($"{text}{(int)number}", (value << 1) + (int)number),
-            _ => throw new ArgumentException(nameof(operation)),
-        };
-
-        return new(nextText, nextValue);
-    }
+    public static Model Append(string text, BigInteger value, Number number) => new($"{text}{(int)number}", (value << 1) + (int)number);
+    public static Model Delete(string text, BigInteger value) => new(text[..^1], value >> 1);
 
     internal static bool CanDelete(Model model) => string.IsNullOrWhiteSpace(model.Text) is false;
 
-    internal static AppendNumber LastAppend(Model model) => (model.Value & 1) == 0 ? AppendNumber.Zero : AppendNumber.One;
+    internal static Number LastAppend(Model model) => (model.Value & 1) == 0 ? Number.Zero : Number.One;
 }
 
 internal enum OperationType
@@ -56,10 +32,10 @@ internal enum OperationType
     Delete,
 }
 
-internal enum AppendNumber
+internal enum Number
 {
     Zero,
     One,
 }
 
-internal record struct Operation(OperationType OperationType, AppendNumber Number);
+internal record struct Operation(OperationType OperationType, Number Number);

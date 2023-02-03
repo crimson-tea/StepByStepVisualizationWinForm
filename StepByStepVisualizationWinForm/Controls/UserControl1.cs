@@ -13,8 +13,8 @@ public partial class UserControl1 : UserControl, IRedoUndo<Operation>
         _redoUndo = new RedoUndo<Operation>(this);
     }
 
-    private void ZeroButton_Click(object sender, EventArgs e) => _redoUndo.Execute(new Operation(OperationType.Append, AppendNumber.Zero));
-    private void OneButton_Click(object sender, EventArgs e) => _redoUndo.Execute(new Operation(OperationType.Append, AppendNumber.One));
+    private void ZeroButton_Click(object sender, EventArgs e) => _redoUndo.Execute(new Operation(OperationType.Append, Number.Zero));
+    private void OneButton_Click(object sender, EventArgs e) => _redoUndo.Execute(new Operation(OperationType.Append, Number.One));
     private void DeleteButton_Click(object sender, EventArgs e) => _redoUndo.Execute(new Operation(OperationType.Delete, BinaryToDecimalConverter.LastAppend(_model)));
 
     private void PreviousButton_Click(object sender, EventArgs e) => _redoUndo.Undo();

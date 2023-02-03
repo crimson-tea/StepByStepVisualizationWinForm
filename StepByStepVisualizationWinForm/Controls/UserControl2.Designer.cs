@@ -1,4 +1,4 @@
-﻿namespace StepByStepVisualizationWinForm
+﻿namespace StepByStepVisualizationWinForm.Controls
 {
     partial class UserControl2
     {

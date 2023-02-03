@@ -44,6 +44,8 @@ internal class BinaryToDecimalConverter
 
         return new(nextText, nextValue);
     }
+
+    internal static bool CanDelete(Model model) => string.IsNullOrWhiteSpace(model.Text) is false;
 }
 
 internal enum OperationType

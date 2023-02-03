@@ -22,7 +22,7 @@ internal class BinaryToDecimalConverter
 
         var (nextText, nextValue) = op switch
         {
-            OperationType.Append => (text + number, (value << 1) + int.Parse(number.ToString())),
+            OperationType.Append => ($"{text}{(int)number}", (value << 1) + (int)number),
             OperationType.Delete => (text[..^1], value >> 1),
             _ => throw new ArgumentException(nameof(operation)),
         };
@@ -38,7 +38,7 @@ internal class BinaryToDecimalConverter
         var (nextText, nextValue) = op switch
         {
             OperationType.Append => (text[..^1], value >> 1),
-            OperationType.Delete => (text + number, (value << 1) + int.Parse(number.ToString())),
+            OperationType.Delete => ($"{text}{(int)number}", (value << 1) + (int)number),
             _ => throw new ArgumentException(nameof(operation)),
         };
 
@@ -46,6 +46,8 @@ internal class BinaryToDecimalConverter
     }
 
     internal static bool CanDelete(Model model) => string.IsNullOrWhiteSpace(model.Text) is false;
+
+    internal static AppendNumber LastAppend(Model model) => (model.Value & 1) == 0 ? AppendNumber.Zero : AppendNumber.One;
 }
 
 internal enum OperationType
@@ -54,5 +56,10 @@ internal enum OperationType
     Delete,
 }
 
-internal record struct Operation(OperationType OperationType, char Char);
+internal enum AppendNumber
+{
+    Zero,
+    One,
+}
 
+internal record struct Operation(OperationType OperationType, AppendNumber Number);

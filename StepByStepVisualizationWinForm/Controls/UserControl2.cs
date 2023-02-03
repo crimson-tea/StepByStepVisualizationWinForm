@@ -1,7 +1,7 @@
 ﻿using StepByStepVisualizationWinForm.Control2;
 using System.Diagnostics;
 
-namespace StepByStepVisualizationWinForm;
+namespace StepByStepVisualizationWinForm.Controls;
 
 public partial class UserControl2 : UserControl, IRedoUndo<Operation>
 {

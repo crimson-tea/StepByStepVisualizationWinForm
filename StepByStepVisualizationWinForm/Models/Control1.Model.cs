@@ -22,8 +22,10 @@ internal class BinaryToDecimalConverter
     public static Model Delete(string text, BigInteger value) => new(text[..^1], value >> 1);
 
     internal static bool CanDelete(Model model) => string.IsNullOrWhiteSpace(model.Text) is false;
+    internal static bool CanAppendZero(Model model) => string.IsNullOrWhiteSpace(model.Text) is false;
 
     internal static Number LastAppend(Model model) => (model.Value & 1) == 0 ? Number.Zero : Number.One;
+
 }
 
 internal enum OperationType

@@ -75,7 +75,7 @@
             this.NextButton.Name = "NextButton";
             this.NextButton.Size = new System.Drawing.Size(75, 23);
             this.NextButton.TabIndex = 5;
-            this.NextButton.Text = "Next";
+            this.NextButton.Text = "Redo";
             this.NextButton.UseVisualStyleBackColor = true;
             this.NextButton.Click += new System.EventHandler(this.NextButton_Click);
             // 
@@ -85,7 +85,7 @@
             this.PreviousButton.Name = "PreviousButton";
             this.PreviousButton.Size = new System.Drawing.Size(75, 23);
             this.PreviousButton.TabIndex = 4;
-            this.PreviousButton.Text = "Prev";
+            this.PreviousButton.Text = "Undo";
             this.PreviousButton.UseVisualStyleBackColor = true;
             this.PreviousButton.Click += new System.EventHandler(this.PreviousButton_Click);
             // 
@@ -124,7 +124,7 @@
             this.label2.TabIndex = 9;
             this.label2.Text = "10進数:";
             // 
-            // UserControl5
+            // UserControl1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -137,7 +137,7 @@
             this.Controls.Add(this.DeleteButton);
             this.Controls.Add(this.OneButton);
             this.Controls.Add(this.ZeroButton);
-            this.Name = "UserControl5";
+            this.Name = "UserControl1";
             this.Size = new System.Drawing.Size(366, 238);
             this.ResumeLayout(false);
             this.PerformLayout();

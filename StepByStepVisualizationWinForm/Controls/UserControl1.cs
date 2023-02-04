@@ -24,7 +24,8 @@ public partial class UserControl1 : UserControl, IRedoUndo<Operation>
     internal Model Model
     {
         get => _model;
-        set => (_model, textBox1.Text, textBox2.Text, DeleteButton.Enabled) = (value, value.Text, value.Value.ToString(), BinaryToDecimalConverter.CanDelete(value));
+        set => (_model, textBox1.Text, textBox2.Text, DeleteButton.Enabled, ZeroButton.Enabled)
+            = (value, value.Text, value.Value.ToString(), BinaryToDecimalConverter.CanDelete(value), BinaryToDecimalConverter.CanAppendZero(value));
     }
 
     void IRedoUndo<Operation>.ExecuteRedo(Operation operation) => Model = BinaryToDecimalConverter.ChangeState(_model, operation, true);

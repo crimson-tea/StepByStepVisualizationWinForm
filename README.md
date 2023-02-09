@@ -20,7 +20,7 @@
 * C# + WinForms
 
 ### 必要条件
-* Windows10 以上
+* Windows 10 以上
 * .NET 6.0 以上
 
 ### 使い方

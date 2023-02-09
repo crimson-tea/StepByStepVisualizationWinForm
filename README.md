@@ -37,7 +37,7 @@ git clone https://github.com/crimson-tea/StepByStepVisualizationWinForm.git
 cd StepByStepVisualizationWinForm/StepByStepVisualizationWinForm/
 ```
 
-#### Visual Studioを利用して起動
+#### Visual Studio 2022を利用して起動
 `StepByStepVisualizationWinForm.sln`ファイルをVisualStudioで開いてください。
 
 `F5`キーでアプリケーションが起動します。

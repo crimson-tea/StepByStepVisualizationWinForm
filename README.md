@@ -26,7 +26,7 @@
 ### 使い方
 #### 事前準備
 ##### githubのサイトを利用する方法
-[このリポジトリ](https://github.com/crimson-tea/StepByStepVisualizationWinForm)のコードをDownloadZipでダウンロードします。
+[このリポジトリ](https://github.com/crimson-tea/StepByStepVisualizationWinForm)のコードをCode -> DownloadZipでダウンロードします。
 
 ダウンロードしたファイルを展開します。
 

@@ -7,7 +7,7 @@ namespace StepByStepVisualizationWinForm
         public enum Direction { Up, Left, Down, Right }
         public enum Cell { Wall, Road, Start, Goal }
 
-        private static Random s_rand = new Random(100001);
+        private static readonly Random s_rand = new Random(100001);
 
         public static readonly Direction[] Directions = new Direction[] {
             Direction.Up,

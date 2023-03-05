@@ -35,6 +35,8 @@
             this.StepLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.SearchTypeLabel = new System.Windows.Forms.Label();
+            this.mazePictureBox = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.mazePictureBox)).BeginInit();
             this.SuspendLayout();
             // 
             // NextButton
@@ -104,10 +106,19 @@
             this.SearchTypeLabel.TabIndex = 7;
             this.SearchTypeLabel.Text = "DFS (better)";
             // 
+            // mazePictureBox
+            // 
+            this.mazePictureBox.Location = new System.Drawing.Point(3, 3);
+            this.mazePictureBox.Name = "mazePictureBox";
+            this.mazePictureBox.Size = new System.Drawing.Size(215, 203);
+            this.mazePictureBox.TabIndex = 8;
+            this.mazePictureBox.TabStop = false;
+            // 
             // UserControl4
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.mazePictureBox);
             this.Controls.Add(this.SearchTypeLabel);
             this.Controls.Add(this.StepLabel);
             this.Controls.Add(this.label1);
@@ -117,7 +128,7 @@
             this.Controls.Add(this.NextButton);
             this.Name = "UserControl4";
             this.Size = new System.Drawing.Size(390, 238);
-            this.Load += new System.EventHandler(this.UserControl4_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.mazePictureBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -132,5 +143,6 @@
         private Label StepLabel;
         private Label label1;
         private Label SearchTypeLabel;
+        private PictureBox mazePictureBox;
     }
 }

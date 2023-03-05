@@ -128,7 +128,6 @@
             this.Controls.Add(this.NextButton);
             this.Name = "UserControl4";
             this.Size = new System.Drawing.Size(390, 238);
-            this.Load += new System.EventHandler(this.UserControl4_Load);
             ((System.ComponentModel.ISupportInitialize)(this.mazePictureBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -34,12 +34,7 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
     private const int IMAGE_WIDTH = WIDTH * CELL_SIZE;
     private const int CELL_SIZE = 5; // 正方形
 
-    private void UserControl4_Load(object sender, EventArgs e)
-    {
-
-    }
-
-    private int[][] InitCosts(int width, int height)
+    private static int[][] InitCosts(int width, int height)
     {
         int[][] costs = new int[height][];
         for (int i = 0; i < costs.Length; i++)
@@ -136,7 +131,7 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
         (-1, 0),
     };
 
-    private Image PathImage(int width, int height, int x, int y, bool isUndo = false)
+    private Image PathImage(int width, int height, int x, int y)
     {
         var image = new Bitmap(width, height, PixelFormat.Format32bppArgb);
         using Graphics g = Graphics.FromImage(image);
@@ -243,7 +238,7 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
         return image;
     }
 
-    private Image CurrentBoarderImage(int width, int height, Rectangle rectangle)
+    private static Image CurrentBoarderImage(int width, int height, Rectangle rectangle)
     {
         var image = new Bitmap(width, height, PixelFormat.Format32bppArgb);
         using Graphics g = Graphics.FromImage(image);
@@ -253,7 +248,7 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
 
     private void SetProgress(int currentStep) => StepLabel.Text = currentStep.ToString();
 
-    enum SearchAlgolithmType { DfsBetter, DfsWorth, Bfs, Dijkstra, AStar, PerfectAStar }
+    private enum SearchAlgolithmType { DfsBetter, DfsWorth, Bfs, Dijkstra, AStar, PerfectAStar }
 
     private SearchAlgolithmType _searchAlgolithm = SearchAlgolithmType.DfsBetter;
 
@@ -271,7 +266,7 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
             SearchAlgolithmType.Dijkstra => (_model.Dijkstra(_maze, _startX, _startY), "Dijkstra"),
             SearchAlgolithmType.AStar => (_model.AStar(_maze, _startX, _startY), "A*"),
             SearchAlgolithmType.PerfectAStar => (_model.AStarWithPerfectHeuristic(_maze, _startX, _startY), "A* (Perfect)"),
-            _ => throw new ArgumentException()
+            _ => throw new ArgumentException(nameof(_searchAlgolithm))
         };
 
         _redoUndo.Reset();
@@ -304,7 +299,7 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
             MazeGenerator.Cell.Road => g.DrawRoad(new Rectangle(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)),
             MazeGenerator.Cell.Start => g.DrawStart(new Rectangle(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)),
             MazeGenerator.Cell.Goal => g.DrawGoal(new Rectangle(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)),
-            _ => throw new ArgumentException()
+            _ => throw new ArgumentException("Cell が未知の状態です。", nameof(cell))
         };
     }
 

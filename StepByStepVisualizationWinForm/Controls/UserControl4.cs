@@ -11,8 +11,6 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
         _redoUndo = new RedoUndo<Operation>(this);
     }
 
-    List<List<Label>> Cells { get; } = new();
-
     private MazeGenerator.Cell[][]? _maze;
     private int _startX;
     private int _startY;
@@ -22,30 +20,24 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
         const int width = 41;
         const int height = 41;
 
-        for (int i = 0; i < height; i++)
-        {
-            Cells.Add(new List<Label>());
-        }
-
         _costs = new int[height][];
         for (int i = 0; i < _costs.Length; i++)
         {
             _costs[i] = new int[width];
         }
 
-        var labelSize = new Size(5, 5);
+        var size = new Size(5, 5);
         _maze = MazeGenerator.GenerateMaze(width, height);
 
+        Bitmap bmp = new Bitmap(width, height);
+        Graphics g = Graphics.FromImage(bmp);
         for (int i = 0; i < _maze.Length; i++)
         {
             for (int k = 0; k < _maze[i].Length; k++)
             {
-                var label = new Label();
-                label.TextAlign = ContentAlignment.MiddleCenter;
+                var point = new Point(k * size.Width, i * size.Height);
 
-                label.Size = labelSize;
-                label.Location = new Point(k * labelSize.Width, i * labelSize.Height);
-                Cells[i].Add(label);
+                g.FillRectangle(SystemBrushes.Control, new Rectangle(point, size));
 
                 if (_maze[i][k] == MazeGenerator.Cell.Start)
                 {
@@ -58,22 +50,20 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
         }
 
         InitMaze();
-
-        SuspendLayout();
-        Controls.AddRange(Cells.SelectMany(x => x).ToArray());
-        ResumeLayout();
     }
 
-    private readonly Model _model = new Model();
+    private readonly Model _model = new();
 
     private int[][] _costs;
 
     private readonly RedoUndo<Operation> _redoUndo;
 
     private IEnumerator<Operation> _enumerator;
+
     private IEnumerator<Operation> Enumerator => _enumerator ??= _model.DfsBetter(_maze, _startX, _startY);
 
     private bool _isProcessing = false;
+
     private void AutoButton_Click(object sender, EventArgs e)
     {
         var button = (Button)sender;
@@ -133,7 +123,7 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
         }
     }
 
-    private static (int x, int y)[] s_vector = new (int x, int y)[]
+    private readonly static (int x, int y)[] s_vector = new (int x, int y)[]
     {
         (0, 1),
         (1, 0),
@@ -157,6 +147,7 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
 
         Cells[y][x].BackColor = isUndo ? Color.DarkGray : Color.Green;
     }
+
     private void ExecuteRedo(Operation op)
     {
         var (type, current, prev, cost) = op;
@@ -223,6 +214,7 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
     private void SetProgress(int currentStep) => StepLabel.Text = currentStep.ToString();
 
     enum SearchAlgolithmType { DfsBetter, DfsWorth, Bfs, Dijkstra, AStar, PerfectAStar }
+
     private SearchAlgolithmType _searchAlgolithm = SearchAlgolithmType.DfsBetter;
     int AlgolithmCount => Enum.GetNames<SearchAlgolithmType>().Length;
 
@@ -245,16 +237,19 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
         RefreshNumbers();
     }
 
+    private Bitmap _image;
     private void InitMaze()
     {
+        using Graphics g = Graphics.FromImage(_image);
+
+        var x = _maze.Select((x, i) => x.Select((y, j) => (cell: y, i, j)).ToArray()).ToArray();
+        x.SelectMany(x => x).Select(GraphicsExtensions.Draw);
+
         for (int i = 0; i < _maze.Length; i++)
         {
             for (int k = 0; k < _maze[i].Length; k++)
             {
-                var label = Cells[i][k];
-                label.BorderStyle = BorderStyle.None;
-
-                (label.Text, label.BackColor) = _maze[i][k] switch
+                var (text, color) = _maze[i][k] switch
                 {
                     MazeGenerator.Cell.Wall => ("", Color.Black),
                     MazeGenerator.Cell.Road => ("", SystemColors.Control),
@@ -262,6 +257,8 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
                     MazeGenerator.Cell.Goal => ("G", Color.Green),
                     _ => throw new ArgumentException()
                 };
+
+                g.DrawWall(color)
 
                 if (_maze[i][k] == MazeGenerator.Cell.Start)
                 {
@@ -290,4 +287,37 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
     void IRedoUndo<Operation>.ExecuteRedo(Operation operation) => ExecuteRedo(operation);
     void IRedoUndo<Operation>.ExecuteUndo(Operation operation) => ExecuteUndo(operation);
     void IRedoUndo<Operation>.SetProgress(int step) => SetProgress(step);
+}
+
+public static class GraphicsExtensions
+{
+    public static Graphics DrawWall(this Graphics g, Rectangle rectangle)
+    {
+        g.FillRectangle(Brushes.Black, rectangle);
+        return g;
+    }
+
+    public static Graphics DrawRoad(this Graphics g, Rectangle rectangle)
+    {
+        g.FillRectangle(SystemBrushes.Control, rectangle);
+        return g;
+    }
+
+    public static Graphics DrawMarked(this Graphics g, Rectangle rectangle)
+    {
+        g.FillRectangle(Brushes.Gray, rectangle);
+        return g;
+    }
+
+    public static Graphics DrawPath(this Graphics g, Rectangle rectangle)
+    {
+        g.FillRectangle(Brushes.Green, rectangle);
+        return g;
+    }
+
+    public static Graphics DrawBorder(this Graphics g, Rectangle rectangle)
+    {
+        g.DrawRectangle(Pens.DarkGray, rectangle);
+        return g;
+    }
 }

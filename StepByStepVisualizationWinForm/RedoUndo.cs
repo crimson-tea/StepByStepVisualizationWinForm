@@ -5,8 +5,8 @@
 /// </summary>
 internal abstract class RedoUndoBase<TOperation>
 {
-    private Stack<TOperation> _undo;
-    private Stack<TOperation> _redo;
+    private readonly Stack<TOperation> _undo;
+    private readonly Stack<TOperation> _redo;
     protected abstract void RedoAction(TOperation operation);
     protected abstract void UndoAction(TOperation operation);
     protected abstract void SetProgress(int steps);

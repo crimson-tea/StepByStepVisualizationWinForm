@@ -1,5 +1,6 @@
 ﻿using StepByStepVisualizationWinForm.Control4;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 
 namespace StepByStepVisualizationWinForm.Controls;
 
@@ -9,47 +10,51 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
     {
         InitializeComponent();
         _redoUndo = new RedoUndo<Operation>(this);
+
+        _costs = new int[HEIGHT][];
+        for (int i = 0; i < _costs.Length; i++)
+        {
+            _costs[i] = new int[WIDTH];
+        }
+
+        _maze = MazeGenerator.GenerateMaze(WIDTH, HEIGHT);
+        _costs = InitCosts(WIDTH, IMAGE_HEIGHT);
+
+        mazePictureBox.BackgroundImageLayout = ImageLayout.None;
+        mazePictureBox.BackgroundImage = InitMaze(IMAGE_WIDTH, IMAGE_HEIGHT);
     }
 
-    private MazeGenerator.Cell[][]? _maze;
-    private int _startX;
-    private int _startY;
+    private readonly MazeGenerator.Cell[][] _maze;
+    private readonly int _startX = 1;
+    private readonly int _startY = 1;
+
+    private const int WIDTH = 39;
+    private const int HEIGHT = 39;
+    private const int IMAGE_HEIGHT = HEIGHT * CELL_SIZE;
+    private const int IMAGE_WIDTH = WIDTH * CELL_SIZE;
+    private const int CELL_SIZE = 5; // 正方形
 
     private void UserControl4_Load(object sender, EventArgs e)
     {
-        const int width = 41;
-        const int height = 41;
 
-        _costs = new int[height][];
-        for (int i = 0; i < _costs.Length; i++)
+    }
+
+    private int[][] InitCosts(int width, int height)
+    {
+        int[][] costs = new int[height][];
+        for (int i = 0; i < costs.Length; i++)
         {
-            _costs[i] = new int[width];
+            costs[i] = new int[width];
         }
 
-        var size = new Size(5, 5);
-        _maze = MazeGenerator.GenerateMaze(width, height);
-
-        Bitmap bmp = new Bitmap(width, height);
-        Graphics g = Graphics.FromImage(bmp);
-        for (int i = 0; i < _maze.Length; i++)
+        for (int i = 0; i < costs.Length; i++)
         {
-            for (int k = 0; k < _maze[i].Length; k++)
+            for (int k = 0; k < costs[i].Length; k++)
             {
-                var point = new Point(k * size.Width, i * size.Height);
-
-                g.FillRectangle(SystemBrushes.Control, new Rectangle(point, size));
-
-                if (_maze[i][k] == MazeGenerator.Cell.Start)
-                {
-                    _startX = k;
-                    _startY = i;
-                }
-
-                // Debug.WriteLine(label.Location);
+                costs[i][k] = int.MaxValue;
             }
         }
-
-        InitMaze();
+        return costs;
     }
 
     private readonly Model _model = new();
@@ -58,7 +63,7 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
 
     private readonly RedoUndo<Operation> _redoUndo;
 
-    private IEnumerator<Operation> _enumerator;
+    private IEnumerator<Operation>? _enumerator;
 
     private IEnumerator<Operation> Enumerator => _enumerator ??= _model.DfsBetter(_maze, _startX, _startY);
 
@@ -66,7 +71,7 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
 
     private void AutoButton_Click(object sender, EventArgs e)
     {
-        var button = (Button)sender;
+        var AutoButton = (Button)sender;
 
         if (_isProcessing)
         {
@@ -75,7 +80,7 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
         }
 
         _isProcessing = true;
-        button.Text = "Stop";
+        AutoButton.Text = "Stop";
 
         while (_isProcessing && _redoUndo.Redo())
         {
@@ -96,7 +101,7 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
         }
 
         _isProcessing = false;
-        button.Text = "Auto";
+        AutoButton.Text = "Auto";
     }
 
     private void NextButton_Click(object sender, EventArgs e)
@@ -131,13 +136,19 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
         (-1, 0),
     };
 
-    private void DrawPath(int x, int y, bool isUndo = false)
+    private Image PathImage(int width, int height, int x, int y, bool isUndo = false)
     {
+        var image = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+        using Graphics g = Graphics.FromImage(image);
+
         int cost = _costs[y][x];
         while (x != 1 || y != 1)
         {
-            Cells[y][x].BackColor = isUndo ? Color.DarkGray : Color.Green;
+            g.DrawPath(new Rectangle(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE));
+
+            mazePictureBox.Image = image;
             Application.DoEvents();
+
             cost--;
 
             var (nx, ny) = s_vector.First(p => _costs[p.y + y][p.x + x] == cost);
@@ -145,7 +156,8 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
             y += ny;
         }
 
-        Cells[y][x].BackColor = isUndo ? Color.DarkGray : Color.Green;
+        g.DrawPath(new Rectangle(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE));
+        return image;
     }
 
     private void ExecuteRedo(Operation op)
@@ -154,32 +166,32 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
         var (curX, curY) = current;
         var (preX, preY) = prev;
 
-        // Debug.WriteLine(op);
-
-        switch (type)
+        if (type == OperationType.Open)
         {
-            case OperationType.None:
-                break;
-            case OperationType.Complete:
-                Cells[preY][preX].BorderStyle = BorderStyle.None;
-                _costs[curY][curX] = cost;
-                DrawPath(preX, preY);
-                break;
-            case OperationType.Open:
-                Cells[curY][curX].BackColor = Color.DarkGray;
-                Cells[curY][curX].BorderStyle = BorderStyle.FixedSingle;
-                _costs[curY][curX] = cost;
-
-                if (prev != Point.Empty)
-                {
-                    Cells[preY][preX].BorderStyle = BorderStyle.None;
-                }
-
-                break;
-            default:
-                break;
+            _costs[curY][curX] = cost;
         }
+
+        var image = InitMaze(IMAGE_WIDTH, IMAGE_HEIGHT);
+
+        mazePictureBox.BackgroundImage?.Dispose();
+        mazePictureBox.BackgroundImage = type switch
+        {
+            OperationType.None => null,
+            OperationType.Complete => DrawHistory(image, _costs),
+            OperationType.Open => DrawHistory(image, _costs),
+            _ => throw new ArgumentException(nameof(op.OperationType)),
+        };
+
+        mazePictureBox.Image?.Dispose();
+        mazePictureBox.Image = type switch
+        {
+            OperationType.None => null,
+            OperationType.Complete => PathImage(IMAGE_WIDTH, IMAGE_HEIGHT, preX, preY),
+            OperationType.Open => CurrentBoarderImage(IMAGE_WIDTH, IMAGE_HEIGHT, new Rectangle(curX * CELL_SIZE, curY * CELL_SIZE, CELL_SIZE, CELL_SIZE)),
+            _ => throw new ArgumentException(nameof(op.OperationType)),
+        };
     }
+
     private void ExecuteUndo(Operation op)
     {
         var (type, current, prev, _) = op;
@@ -188,27 +200,55 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
 
         Debug.WriteLine(op);
 
-        switch (type)
+        if (type == OperationType.Open)
         {
-            case OperationType.None:
-                break;
-            case OperationType.Complete:
-                Cells[preY][preX].BorderStyle = BorderStyle.FixedSingle;
-                DrawPath(preX, preY, true);
-                break;
-            case OperationType.Open:
-                Cells[curY][curX].BackColor = SystemColors.Control;
-                Cells[curY][curX].BorderStyle = BorderStyle.None;
-                _costs[curY][curX] = int.MaxValue;
-
-                if (prev != Point.Empty)
-                {
-                    Cells[preY][preX].BorderStyle = BorderStyle.FixedSingle;
-                }
-                break;
-            default:
-                break;
+            _costs[curY][curX] = int.MaxValue;
         }
+
+        var image = InitMaze(IMAGE_WIDTH, IMAGE_HEIGHT);
+
+        mazePictureBox.BackgroundImage?.Dispose();
+        mazePictureBox.BackgroundImage = type switch
+        {
+            OperationType.None => null,
+            OperationType.Complete => DrawHistory(image, _costs),
+            OperationType.Open => DrawHistory(image, _costs),
+            _ => throw new ArgumentException(nameof(op.OperationType)),
+        };
+
+        mazePictureBox.Image?.Dispose();
+        mazePictureBox.Image = (type, preX, preY) switch
+        {
+            (OperationType.None, _, _) => null,
+            (OperationType.Complete, _, _) => CurrentBoarderImage(IMAGE_WIDTH, IMAGE_HEIGHT, new Rectangle(preX * CELL_SIZE, preY * CELL_SIZE, CELL_SIZE, CELL_SIZE)),
+            (OperationType.Open, 0, 0) => null,
+            (OperationType.Open, _, _) => CurrentBoarderImage(IMAGE_WIDTH, IMAGE_HEIGHT, new Rectangle(preX * CELL_SIZE, preY * CELL_SIZE, CELL_SIZE, CELL_SIZE)),
+            _ => throw new ArgumentException(nameof(op.OperationType)),
+        };
+    }
+
+    private static Bitmap DrawHistory(Bitmap image, int[][] costs)
+    {
+        using Graphics g = Graphics.FromImage(image);
+        for (int y = 0; y < costs.Length; y++)
+        {
+            for (int x = 0; x < costs[y].Length; x++)
+            {
+                if (costs[y][x] != int.MaxValue)
+                {
+                    g.DrawMarked(new Rectangle(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE));
+                }
+            }
+        }
+        return image;
+    }
+
+    private Image CurrentBoarderImage(int width, int height, Rectangle rectangle)
+    {
+        var image = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+        using Graphics g = Graphics.FromImage(image);
+        g.DrawBorder(rectangle);
+        return image;
     }
 
     private void SetProgress(int currentStep) => StepLabel.Text = currentStep.ToString();
@@ -216,7 +256,8 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
     enum SearchAlgolithmType { DfsBetter, DfsWorth, Bfs, Dijkstra, AStar, PerfectAStar }
 
     private SearchAlgolithmType _searchAlgolithm = SearchAlgolithmType.DfsBetter;
-    int AlgolithmCount => Enum.GetNames<SearchAlgolithmType>().Length;
+
+    static int AlgolithmCount => Enum.GetNames<SearchAlgolithmType>().Length;
 
     private void SwitchSieveButton_Click(object sender, EventArgs e)
     {
@@ -234,54 +275,37 @@ public partial class UserControl4 : UserControl, IRedoUndo<Operation>
         };
 
         _redoUndo.Reset();
-        RefreshNumbers();
+        _costs = InitCosts(WIDTH, HEIGHT);
+        mazePictureBox.BackgroundImage?.Dispose();
+        mazePictureBox.BackgroundImage = InitMaze(IMAGE_WIDTH, IMAGE_HEIGHT);
+        mazePictureBox.Image?.Dispose();
+        mazePictureBox.Image = null;
     }
 
-    private Bitmap _image;
-    private void InitMaze()
+
+    private Bitmap InitMaze(int imageWidth, int imageHeight)
     {
-        using Graphics g = Graphics.FromImage(_image);
+        var image = new Bitmap(imageWidth, imageHeight, PixelFormat.Format24bppRgb);
+        using Graphics g = Graphics.FromImage(image);
+        g.FillRectangle(Brushes.White, new Rectangle(Point.Empty, image.Size));
 
-        var x = _maze.Select((x, i) => x.Select((y, j) => (cell: y, i, j)).ToArray()).ToArray();
-        x.SelectMany(x => x).Select(GraphicsExtensions.Draw);
+        // こうも書けるがわかりにくい。
+        // _ = _maze.Select((row, y) => row.Select((c, x) => (c, x)).Aggregate(g, (g, t) => DrawMaze(g, t.c, t.x, y))).Last();
 
-        for (int i = 0; i < _maze.Length; i++)
+        for (int y = 0; y < _maze.Length; y++)
+            for (int i = 0; i < _maze[y].Length; i++)
+                _ = DrawMaze(g, _maze[y][i], i, y);
+
+        return image;
+
+        static Graphics DrawMaze(Graphics g, MazeGenerator.Cell cell, int x, int y) => cell switch
         {
-            for (int k = 0; k < _maze[i].Length; k++)
-            {
-                var (text, color) = _maze[i][k] switch
-                {
-                    MazeGenerator.Cell.Wall => ("", Color.Black),
-                    MazeGenerator.Cell.Road => ("", SystemColors.Control),
-                    MazeGenerator.Cell.Start => ("S", Color.Red),
-                    MazeGenerator.Cell.Goal => ("G", Color.Green),
-                    _ => throw new ArgumentException()
-                };
-
-                g.DrawWall(color)
-
-                if (_maze[i][k] == MazeGenerator.Cell.Start)
-                {
-                    _startX = k;
-                    _startY = i;
-                }
-
-                // Debug.WriteLine(label.Location);
-            }
-        }
-
-        for (int i = 0; i < _costs.Length; i++)
-        {
-            for (int k = 0; k < _costs[i].Length; k++)
-            {
-                _costs[i][k] = int.MaxValue;
-            }
-        }
-    }
-
-    private void RefreshNumbers()
-    {
-        InitMaze();
+            MazeGenerator.Cell.Wall => g.DrawWall(new Rectangle(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)),
+            MazeGenerator.Cell.Road => g.DrawRoad(new Rectangle(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)),
+            MazeGenerator.Cell.Start => g.DrawStart(new Rectangle(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)),
+            MazeGenerator.Cell.Goal => g.DrawGoal(new Rectangle(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)),
+            _ => throw new ArgumentException()
+        };
     }
 
     void IRedoUndo<Operation>.ExecuteRedo(Operation operation) => ExecuteRedo(operation);
@@ -309,6 +333,18 @@ public static class GraphicsExtensions
         return g;
     }
 
+    public static Graphics DrawStart(this Graphics g, Rectangle rectangle)
+    {
+        g.FillRectangle(Brushes.Red, rectangle);
+        return g;
+    }
+
+    public static Graphics DrawGoal(this Graphics g, Rectangle rectangle)
+    {
+        g.FillRectangle(Brushes.Green, rectangle);
+        return g;
+    }
+
     public static Graphics DrawPath(this Graphics g, Rectangle rectangle)
     {
         g.FillRectangle(Brushes.Green, rectangle);
@@ -317,7 +353,8 @@ public static class GraphicsExtensions
 
     public static Graphics DrawBorder(this Graphics g, Rectangle rectangle)
     {
-        g.DrawRectangle(Pens.DarkGray, rectangle);
+        var pen = new Pen(Brushes.DarkGray, 2);
+        g.DrawRectangle(pen, rectangle);
         return g;
     }
 }
